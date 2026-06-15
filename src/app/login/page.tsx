@@ -5,46 +5,50 @@ import { Form, Input, Button, Alert, message } from 'antd';
 import { UserOutlined, LockOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { useAuthStore } from '@/store/authStore';
-import { ROUTES } from '@/constants';
+import { dungKhoXacThuc } from '@/store/khoXacThuc';
+import { DUONG_DAN } from '@/constants';
 import ctuLogo from '@/assets/CTU_logo.png';
 
+/**
+ * Trang Đăng nhập hệ thống (LoginPage).
+ * Chức năng: Cho phép quản trị viên/trực ban đăng nhập vào hệ thống để bắt đầu quản lý.
+ */
 export default function LoginPage() {
-  const router = useRouter();
-  const { isAuthenticated, isInitialized, login } = useAuthStore();
-  const [loading, setLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const boDinhTuyen = useRouter();
+  const { daXacThuc, daKhoiTao, dangNhap } = dungKhoXacThuc();
+  const [dangTai, datDangTai] = useState(false);
+  const [thongBaoLoi, datThongBaoLoi] = useState<string | null>(null);
 
-  // Redirect to dashboard if already authenticated
+  // Tự động chuyển hướng sang bảng điều khiển nếu người dùng đã đăng nhập từ trước
   useEffect(() => {
-    if (isInitialized && isAuthenticated) {
-      router.push(ROUTES.DASHBOARD);
+    if (daKhoiTao && daXacThuc) {
+      boDinhTuyen.push(DUONG_DAN.DASHBOARD);
     }
-  }, [isInitialized, isAuthenticated, router]);
+  }, [daKhoiTao, daXacThuc, boDinhTuyen]);
 
-  // Handle form submit
-  const onFinish = async (values: any) => {
-    const { username, password } = values;
-    setLoading(true);
-    setErrorMsg(null);
+  // Xử lý sự kiện khi biểu mẫu đăng nhập được gửi đi
+  const xuLyDangNhap = async (giaTri: any) => {
+    const { tenDangNhap, matKhau } = giaTri;
+    datDangTai(true);
+    datThongBaoLoi(null);
 
     try {
-      const success = await login(username, password);
-      if (success) {
+      const thanhCong = await dangNhap(tenDangNhap, matKhau);
+      if (thanhCong) {
         message.success('Đăng nhập hệ thống thành công!');
-        router.push(ROUTES.DASHBOARD);
+        boDinhTuyen.push(DUONG_DAN.DASHBOARD);
       } else {
-        setErrorMsg('Tên đăng nhập không chính xác hoặc tài khoản đã bị khóa.');
+        datThongBaoLoi('Tên đăng nhập không chính xác hoặc tài khoản đã bị khóa.');
       }
-    } catch (err) {
-      setErrorMsg('Đã xảy ra lỗi kết nối hệ thống. Vui lòng thử lại sau.');
+    } catch (loi) {
+      datThongBaoLoi('Đã xảy ra lỗi kết nối hệ thống. Vui lòng thử lại sau.');
     } finally {
-      setLoading(false);
+      datDangTai(false);
     }
   };
 
-  // Show white screen when check initial auth state
-  if (!isInitialized || (isInitialized && isAuthenticated)) {
+  // Hiển thị vòng xoay chờ khởi tạo phiên làm việc ban đầu
+  if (!daKhoiTao || (daKhoiTao && daXacThuc)) {
     return (
       <div className="min-h-screen w-screen flex flex-col items-center justify-center bg-[#F5F7FA]">
         <div className="flex flex-col items-center gap-2">
@@ -60,13 +64,13 @@ export default function LoginPage() {
       className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0f3a74] via-[#1f5ca9] to-[#00afef] p-4 relative overflow-hidden"
       style={{ fontFamily: 'var(--font-readex-pro)' }}
     >
-      {/* Background design elements */}
+      {/* Các thành phần trang trí nền */}
       <div className="absolute top-[-10%] right-[-10%] w-[50vw] h-[50vw] rounded-full bg-cyan-400/15 blur-3xl select-none pointer-events-none"></div>
       <div className="absolute bottom-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full bg-blue-600/20 blur-3xl select-none pointer-events-none"></div>
 
       <div className="w-full max-w-[430px] bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl p-6 md:p-8 border border-white/20 relative z-10">
         
-        {/* Header Branding */}
+        {/* Tiêu đề Logo & Nhãn hiệu trường */}
         <div className="flex flex-col items-center mb-6">
           <div className="h-16 w-16 mb-3 flex items-center justify-center select-none">
             <Image 
@@ -93,26 +97,26 @@ export default function LoginPage() {
           <div className="w-16 h-[2px] bg-gradient-to-r from-transparent via-[#1f5ca9] to-transparent mt-4 opacity-50"></div>
         </div>
 
-        {/* Error Notification */}
-        {errorMsg && (
+        {/* Thông báo lỗi nếu đăng nhập thất bại */}
+        {thongBaoLoi && (
           <Alert
-            message={errorMsg}
+            message={thongBaoLoi}
             type="error"
             showIcon
             className="mb-4 text-xs"
           />
         )}
 
-        {/* Login Form */}
+        {/* Biểu mẫu đăng nhập */}
         <Form
-          name="login_form"
+          name="bieu_mau_dang_nhap"
           layout="vertical"
-          onFinish={onFinish}
+          onFinish={xuLyDangNhap}
           requiredMark={false}
           className="mt-2"
         >
           <Form.Item
-            name="username"
+            name="tenDangNhap"
             rules={[
               { required: true, message: 'Vui lòng nhập tên đăng nhập!' },
               { whitespace: true, message: 'Tên đăng nhập không được chứa khoảng trắng!' }
@@ -127,7 +131,7 @@ export default function LoginPage() {
           </Form.Item>
 
           <Form.Item
-            name="password"
+            name="matKhau"
             rules={[
               { required: true, message: 'Vui lòng nhập mật khẩu!' }
             ]}
@@ -144,7 +148,7 @@ export default function LoginPage() {
             <Button 
               type="primary" 
               htmlType="submit" 
-              loading={loading}
+              loading={dangTai}
               className="w-full h-11 rounded-lg font-sans font-semibold text-sm bg-[#1f5ca9] hover:bg-[#154a8a] border-none shadow-sm transition-all"
             >
               Đăng nhập
@@ -152,7 +156,7 @@ export default function LoginPage() {
           </Form.Item>
         </Form>
 
-        {/* Demo Credentials Info Box */}
+        {/* Hướng dẫn tài khoản kiểm thử */}
         <div className="bg-[#f0f7ff] border border-[#d2e7ff] rounded-lg p-3 text-xs text-slate-600 font-sans leading-relaxed">
           <div className="flex items-center gap-1.5 font-semibold text-[#1f5ca9] mb-1.5">
             <InfoCircleOutlined className="text-sm shrink-0" />
@@ -169,7 +173,7 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* Footer info */}
+        {/* Thông tin bản quyền chân trang */}
         <div className="text-center mt-6 text-[10px] text-slate-400 border-t border-slate-100 pt-4 font-sans select-none leading-normal">
           <p className="mb-0">© 2026 Đại học Cần Thơ</p>
           <p className="mb-0 text-slate-300">Phát triển bởi Trung tâm Công nghệ Phần mềm (CUSC)</p>
@@ -179,3 +183,4 @@ export default function LoginPage() {
     </div>
   );
 }
+

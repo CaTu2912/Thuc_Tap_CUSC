@@ -2,21 +2,21 @@
 
 import React, { useState, useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ConfigProvider } from 'antd';
+import { ConfigProvider, App } from 'antd';
 import viVN from 'antd/locale/vi_VN';
 import { ctuTheme } from '@/lib/theme';
-import { useAuthStore } from '@/store/authStore';
+import { dungKhoXacThuc } from '@/store/khoXacThuc';
 
 interface AppProvidersProps {
   children: React.ReactNode;
 }
 
 export default function AppProviders({ children }: AppProvidersProps) {
-  const initialize = useAuthStore((state) => state.initialize);
+  const khoiTao = dungKhoXacThuc((trangThai) => trangThai.khoiTao);
 
   useEffect(() => {
-    initialize();
-  }, [initialize]);
+    khoiTao();
+  }, [khoiTao]);
 
   const [queryClient] = useState(
     () =>
@@ -33,7 +33,9 @@ export default function AppProviders({ children }: AppProvidersProps) {
   return (
     <QueryClientProvider client={queryClient}>
       <ConfigProvider locale={viVN} theme={ctuTheme}>
-        {children}
+        <App>
+          {children}
+        </App>
       </ConfigProvider>
     </QueryClientProvider>
   );

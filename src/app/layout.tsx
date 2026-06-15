@@ -27,7 +27,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="vi" className={`h-full antialiased ${k2d.variable} ${readexPro.variable}`}>
+    <html lang="vi" className={`h-full antialiased ${k2d.variable} ${readexPro.variable}`} suppressHydrationWarning>
       <body className="min-h-full flex flex-col">
         <AppProviders>{children}</AppProviders>
       </body>

@@ -1,178 +1,229 @@
 'use client';
 
 import React, { useState } from 'react';
-import MainLayout from '../../../components/layout/MainLayout';
-import PageHeader from '../../../components/common/PageHeader';
-import SearchToolbar from '../../../components/common/SearchToolbar';
-import DataTable from '../../../components/common/DataTable';
-import StatusTag from '../../../components/common/StatusTag';
-import ConfirmDelete from '../../../components/common/ConfirmDelete';
-import UserDrawer from '../../../components/user/UserDrawer';
-import { useStudentStore } from '../../../store/studentStore';
+import BoCucChinh from '../../../components/layout/BoCucChinh';
+import TieuDeTrang from '../../../components/common/TieuDeTrang';
+import ThanhTimKiemCongCu from '../../../components/common/ThanhTimKiemCongCu';
+import BangDuLieu from '../../../components/common/BangDuLieu';
+import NhanTrangThai from '../../../components/common/NhanTrangThai';
+import XacNhanXoa from '../../../components/common/XacNhanXoa';
+import DrawerNguoiDung from '../../../components/user/DrawerNguoiDung';
+import { dungKhoSinhVien } from '../../../store/khoSinhVien';
 import { Space, Button, Tooltip, message } from 'antd';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { ColumnsType } from 'antd/es/table';
-import { User } from '../../../types/User';
-import { mockUsers } from '../../../mocks/student.mock';
+import { NguoiDung } from '../../../types/NguoiDung';
+import { duLieuGiaLapNguoiDung } from '../../../mocks/student.mock';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { exportToExcel } from '../../../utils/excel';
+import { xuatRaFileExcel } from '../../../utils/excel';
 
+/**
+ * Component Trang Danh mục Người dùng hệ thống (UsersCategoryPage).
+ * Chức năng: Quản lý danh sách tài khoản quản trị hệ thống, điều phối viên, trực ban, tìm kiếm, chỉnh sửa, xóa và xuất Excel.
+ */
 export default function UsersCategoryPage() {
-  const [search, setSearch] = useState('');
-  const { setUserDrawerOpen, setSelectedUser } = useStudentStore();
-  const queryClient = useQueryClient();
+  // Trạng thái lưu từ khóa tìm kiếm người dùng
+  const [tuKhoaTimKiem, datTuKhoaTimKiem] = useState('');
+  
+  // Trích xuất các phương thức điều khiển drawer người dùng từ store sinh viên
+  const { datMoDrawerNguoiDung, datNguoiDungDuocChon } = dungKhoSinhVien();
+  const boQuanLyTruyVan = useQueryClient();
 
-  const { data: users = [], isLoading } = useQuery({
-    queryKey: ['users', search],
+  // Thực hiện truy vấn danh sách người dùng từ máy chủ giả lập
+  const { data: danhSachNguoiDung = [], isLoading } = useQuery({
+    queryKey: ['users', tuKhoaTimKiem],
     queryFn: async () => {
-      // Simulate API call to fetch users
-      let result = [...mockUsers];
-      if (search) {
-        result = result.filter(u => 
-          u.username.toLowerCase().includes(search.toLowerCase()) ||
-          u.fullName.toLowerCase().includes(search.toLowerCase()) ||
-          u.email.toLowerCase().includes(search.toLowerCase())
-        );
+      // Giả lập cuộc gọi API lấy danh sách người dùng từ mock data
+      let ketQua = [...duLieuGiaLapNguoiDung];
+      if (tuKhoaTimKiem) {
+        const tuKhoa = tuKhoaTimKiem.toLowerCase();
+        ketQua = ketQua.filter((u) => {
+          return (
+            u.tenDangNhap.toLowerCase().includes(tuKhoa) ||
+            u.hoVaTen.toLowerCase().includes(tuKhoa) ||
+            u.email.toLowerCase().includes(tuKhoa)
+          );
+        });
       }
-      return result;
+      return ketQua;
     },
   });
 
-  const handleAddClick = () => {
-    setSelectedUser(null);
-    setUserDrawerOpen(true);
+  // Hàm xử lý khi nhấn thêm người dùng mới
+  const xuLyThemMoi = () => {
+    datNguoiDungDuocChon(null);
+    datMoDrawerNguoiDung(true);
   };
 
-  const handleEditClick = (user: User) => {
-    setSelectedUser(user);
-    setUserDrawerOpen(true);
+  // Hàm xử lý khi nhấn nút chỉnh sửa người dùng
+  const xuLyChinhSua = (nguoiDung: NguoiDung) => {
+    datNguoiDungDuocChon(nguoiDung);
+    datMoDrawerNguoiDung(true);
   };
 
-  const handleDelete = async (id: string) => {
+  // Hàm xử lý xóa tài khoản người dùng
+  const xuLyXoaNguoiDung = async (id: string) => {
     try {
-      // In mock data, delete from mockUsers
-      const idx = mockUsers.findIndex(u => u.id === id);
-      if (idx !== -1) {
-        mockUsers.splice(idx, 1);
+      // Trong dữ liệu mock, xóa người dùng khỏi mảng duLieuGiaLapNguoiDung
+      const chiSo = duLieuGiaLapNguoiDung.findIndex((u) => {
+        return u.id === id;
+      });
+      if (chiSo !== -1) {
+        duLieuGiaLapNguoiDung.splice(chiSo, 1);
       }
       message.success('Xóa tài khoản hệ thống thành công!');
-      queryClient.invalidateQueries({ queryKey: ['users'] });
-    } catch (err) {
+      boQuanLyTruyVan.invalidateQueries({ queryKey: ['users'] });
+    } catch (loi) {
       message.error('Có lỗi xảy ra khi xóa.');
     }
   };
 
-  const handleExport = () => {
-    const dataToExport = users.map((u, index) => ({
-      'STT': index + 1,
-      'Tên tài khoản': u.username,
-      'Họ và tên': u.fullName,
-      'Địa chỉ Email': u.email,
-      'Vai trò': u.role === 'ADMIN' ? 'Quản trị hệ thống' : u.role === 'MANAGER' ? 'Điều phối viên' : 'Trực ban',
-      'Trạng thái': u.status === 'ACTIVE' ? 'Đang hoạt động' : 'Tạm khóa',
-      'Ngày tạo tài khoản': u.createdAt,
-    }));
-    exportToExcel(dataToExport, `Danh_Sach_Tai_Khoan_He_Thong_${new Date().toISOString().split('T')[0]}`, 'Tài khoản');
+  // Hàm xử lý xuất danh sách người dùng ra file Excel
+  const xuLyXuatExcel = () => {
+    const duLieuXuat = danhSachNguoiDung.map((u, chiSo) => {
+      return {
+        'STT': chiSo + 1,
+        'Tên tài khoản': u.tenDangNhap,
+        'Họ và tên': u.hoVaTen,
+        'Địa chỉ Email': u.email,
+        'Vai trò': u.vaiTro === 'ADMIN'
+          ? 'Quản trị hệ thống'
+          : u.vaiTro === 'MANAGER'
+            ? 'Điều phối viên'
+            : 'Trực ban',
+        'Trạng thái': u.trangThai === 'ACTIVE' ? 'Đang hoạt động' : 'Tạm khóa',
+        'Ngày tạo tài khoản': u.ngayTao,
+      };
+    });
+    xuatRaFileExcel(
+      duLieuXuat,
+      `Danh_Sach_Tai_Khoan_He_Thong_${new Date().toISOString().split('T')[0]}`,
+      'Tài khoản'
+    );
   };
 
-  const columns: ColumnsType<User> = [
+  // Cấu hình các cột hiển thị trên bảng dữ liệu người dùng
+  const cotBang: ColumnsType<NguoiDung> = [
     {
       title: 'Tên tài khoản',
-      dataIndex: 'username',
-      key: 'username',
-      render: (text) => <span className="font-semibold text-xs text-zinc-700">{text}</span>,
+      dataIndex: 'tenDangNhap',
+      key: 'tenDangNhap',
+      render: (vanBan) => {
+        return <span className="font-semibold text-xs text-zinc-700">{vanBan}</span>;
+      },
     },
     {
       title: 'Họ và tên',
-      dataIndex: 'fullName',
-      key: 'fullName',
-      render: (text) => <span className="font-bold text-xs text-zinc-800">{text}</span>,
+      dataIndex: 'hoVaTen',
+      key: 'hoVaTen',
+      render: (vanBan) => {
+        return <span className="font-bold text-xs text-zinc-800">{vanBan}</span>;
+      },
     },
     {
       title: 'Địa chỉ Email',
       dataIndex: 'email',
       key: 'email',
-      render: (text) => <span className="text-xs text-zinc-500">{text}</span>,
+      render: (vanBan) => {
+        return <span className="text-xs text-zinc-500">{vanBan}</span>;
+      },
     },
     {
       title: 'Vai trò',
-      dataIndex: 'role',
-      key: 'role',
-      render: (role: string) => {
-        if (role === 'ADMIN') return <span className="text-xs text-rose-500 font-bold">Quản trị hệ thống</span>;
-        if (role === 'MANAGER') return <span className="text-xs text-blue-500 font-bold">Điều phối viên</span>;
+      dataIndex: 'vaiTro',
+      key: 'vaiTro',
+      render: (vaiTro: string) => {
+        if (vaiTro === 'ADMIN') {
+          return <span className="text-xs text-rose-500 font-bold">Quản trị hệ thống</span>;
+        }
+        if (vaiTro === 'MANAGER') {
+          return <span className="text-xs text-blue-500 font-bold">Điều phối viên</span>;
+        }
         return <span className="text-xs text-zinc-500 font-medium">Trực ban</span>;
       },
     },
     {
       title: 'Trạng thái',
-      dataIndex: 'status',
-      key: 'status',
-      render: (status) => <StatusTag status={status} />,
+      dataIndex: 'trangThai',
+      key: 'trangThai',
+      render: (trangThai) => {
+        return <NhanTrangThai trangThai={trangThai} />;
+      },
     },
     {
       title: 'Ngày tạo',
-      dataIndex: 'createdAt',
-      key: 'createdAt',
-      render: (text) => <span className="text-xs text-zinc-400">{text}</span>,
+      dataIndex: 'ngayTao',
+      key: 'ngayTao',
+      render: (vanBan) => {
+        return <span className="text-xs text-zinc-400">{vanBan}</span>;
+      },
     },
     {
       title: 'Thao tác',
-      key: 'action',
+      key: 'hanhDong',
       width: 100,
       align: 'center',
-      render: (_, record) => (
-        <Space size={8}>
-          <Tooltip title="Chỉnh sửa">
-            <Button
-              type="text"
-              icon={<EditOutlined />}
-              onClick={() => handleEditClick(record)}
-              className="text-[#1f5ca9] hover:bg-sky-50"
-            />
-          </Tooltip>
-          <Tooltip title="Xóa">
-            <div>
-              <ConfirmDelete onConfirm={() => handleDelete(record.id)}>
-                <Button
-                  type="text"
-                  danger
-                  icon={<DeleteOutlined />}
-                  className="hover:bg-red-50"
-                />
-              </ConfirmDelete>
-            </div>
-          </Tooltip>
-        </Space>
-      ),
+      render: (_, record) => {
+        return (
+          <Space size={8}>
+            <Tooltip title="Chỉnh sửa">
+              <Button
+                type="text"
+                icon={<EditOutlined />}
+                onClick={() => {
+                  return xuLyChinhSua(record);
+                }}
+                className="text-[#1f5ca9] hover:bg-sky-50"
+              />
+            </Tooltip>
+            <Tooltip title="Xóa">
+              <div>
+                <XacNhanXoa khiXacNhan={() => {
+                  return xuLyXoaNguoiDung(record.id);
+                }}>
+                  <Button
+                    type="text"
+                    danger
+                    icon={<DeleteOutlined />}
+                    className="hover:bg-red-50"
+                  />
+                </XacNhanXoa>
+              </div>
+            </Tooltip>
+          </Space>
+        );
+      },
     },
   ];
 
   return (
-    <MainLayout>
-      <PageHeader
-        title="Quản lý Tài Khoản Hệ Thống"
-        description="Phân quyền tài khoản quản lý và giám sát vận hành các thiết bị ra vào"
+    <BoCucChinh>
+      <TieuDeTrang
+        tieuDe="Quản lý Tài Khoản Hệ Thống"
+        moTa="Phân quyền tài khoản quản lý và giám sát vận hành các thiết bị ra vào"
       />
 
-      <SearchToolbar
-        placeholder="Tìm theo tài khoản, tên hoặc email..."
-        searchValue={search}
-        onSearchChange={setSearch}
-        onAddClick={handleAddClick}
-        onExportClick={handleExport}
-        onResetClick={() => setSearch('')}
-        addText="Thêm tài khoản"
+      <ThanhTimKiemCongCu
+        chuGoiY="Tìm theo tài khoản, tên hoặc email..."
+        giaTriTimKiem={tuKhoaTimKiem}
+        khiGiaTriThayDoi={datTuKhoaTimKiem}
+        khiNhanThem={xuLyThemMoi}
+        khiNhanXuatExcel={xuLyXuatExcel}
+        khiNhanLamMoi={() => {
+          return datTuKhoaTimKiem('');
+        }}
+        chuThemMoi="Thêm tài khoản"
       />
 
-      <DataTable<User>
-        columns={columns}
-        dataSource={users}
-        loading={isLoading}
+      <BangDuLieu<NguoiDung>
+        columns={cotBang}
+        dataSource={danhSachNguoiDung}
+        dangTai={isLoading}
         rowKey="id"
       />
 
-      <UserDrawer />
-    </MainLayout>
+      <DrawerNguoiDung />
+    </BoCucChinh>
   );
 }
+

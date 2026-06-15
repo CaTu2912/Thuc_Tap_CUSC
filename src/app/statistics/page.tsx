@@ -2,49 +2,58 @@
 
 import React from 'react';
 import { Radio, RadioChangeEvent } from 'antd';
-import MainLayout from '@/components/layout/MainLayout';
-import PageHeader from '@/components/common/PageHeader';
-import TimeframeChart from '@/components/statistics/TimeframeChart';
-import TimeframeTable from '@/components/statistics/TimeframeTable';
-import StatisticTable from '@/components/statistics/StatisticTable';
-import { topStudentColumns } from '@/components/statistics/TopStudentTable';
-import { absentStudentColumns } from '@/components/statistics/AbsentStudentStatsTable';
-import { strangerStatsColumns } from '@/components/statistics/StrangerStatsTable';
-import { bannedStudentStatsColumns } from '@/components/statistics/BannedStudentStatsTable';
-import { useStatistics } from '@/hooks/useStatistics';
-import { useStatisticsStore } from '@/store/statisticsStore';
+import BoCucChinh from '@/components/layout/BoCucChinh';
+import TieuDeTrang from '@/components/common/TieuDeTrang';
+import BieuDoKhungGio from '@/components/statistics/BieuDoKhungGio';
+import BangChiTietRaVao from '@/components/statistics/BangChiTietRaVao';
+import BangThongKeChung from '@/components/statistics/BangThongKeChung';
+import { cotBangSinhVienRaVaoNhieu } from '@/components/statistics/CotBangSinhVienRaVaoNhieu';
+import { cotBangSinhVienVangMat } from '@/components/statistics/CotBangSinhVienVangMat';
+import { cotBangNguoiLa } from '@/components/statistics/CotBangNguoiLa';
+import { cotBangSinhVienBiHanChe } from '@/components/statistics/CotBangSinhVienBiHanChe';
+import { dungThongKe } from '@/hooks/dungThongKe';
+import { dungKhoThongKe, KieuKhungThoiGian } from '@/store/khoThongKe';
 
-const CHART_TITLES = {
+// Các tiêu đề biểu đồ tương ứng với từng khung thời gian lọc
+const TIEU_DE_BIEU_DO = {
   DAY: 'Thống kê theo ngày',
   MONTH: 'Thống kê theo tháng',
   YEAR: 'Thống kê theo năm',
   DORMITORY: 'Thống kê theo khu KTX',
 } as const;
 
+/**
+ * Component Trang Báo cáo Thống kê (StatisticsPage).
+ * Chức năng: Hiển thị các bảng biểu thống kê chi tiết lượt ra vào KTX theo khung giờ/khu nhà, top sinh viên, sinh viên vắng mặt, người lạ và sinh viên bị cấm.
+ */
 export default function StatisticsPage() {
-  const { timeframe, setTimeframe } = useStatisticsStore();
-  const {
-    timeframeStats,
-    topStudents,
-    absentStudents,
-    strangerStats,
-    bannedStudentStats,
-    isLoading,
-  } = useStatistics();
+  // Trích xuất khung thời gian đang chọn và phương thức thiết lập từ store thống kê
+  const { khungThoiGian, datKhungThoiGian } = dungKhoThongKe();
 
-  const handleTimeframeChange = (event: RadioChangeEvent) => {
-    setTimeframe(event.target.value);
+  // Gọi hook quản lý dữ liệu truy vấn thống kê báo cáo
+  const {
+    thongKeKhungThoiGian,
+    topSinhVien,
+    sinhVienVangMat,
+    thongKeNguoiLa,
+    thongKeSinhVienBiHanChe,
+    dangTai,
+  } = dungThongKe();
+
+  // Xử lý sự kiện thay đổi khung thời gian hiển thị thống kê
+  const xuLyThayDoiKhungThoiGian = (suKien: RadioChangeEvent) => {
+    datKhungThoiGian(suKien.target.value as KieuKhungThoiGian);
   };
 
-  const isDormitory = timeframe === 'DORMITORY';
+  const laKtx = khungThoiGian === 'DORMITORY';
 
   return (
-    <MainLayout>
-      <PageHeader
-        title="Thống kê"
-        description="Báo cáo phân tích tần suất ra vào và chỉ số an ninh trong Ký túc xá Đại học Cần Thơ"
-        extra={
-          <Radio.Group value={timeframe} onChange={handleTimeframeChange} className="rounded-lg">
+    <BoCucChinh>
+      <TieuDeTrang
+        tieuDe="Thống kê"
+        moTa="Báo cáo phân tích tần suất ra vào và chỉ số an ninh trong Ký túc xá Đại học Cần Thơ"
+        boSung={
+          <Radio.Group value={khungThoiGian} onChange={xuLyThayDoiKhungThoiGian} className="rounded-lg">
             <Radio.Button value="DAY">Theo ngày</Radio.Button>
             <Radio.Button value="MONTH">Theo tháng</Radio.Button>
             <Radio.Button value="YEAR">Theo năm</Radio.Button>
@@ -53,51 +62,55 @@ export default function StatisticsPage() {
         }
       />
 
+      {/* Phần hiển thị biểu đồ và bảng chi tiết số liệu của khung thời gian */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         <div className="lg:col-span-2">
-          <TimeframeChart
-            title={CHART_TITLES[timeframe]}
-            data={timeframeStats}
-            loading={isLoading}
-            isDormitory={isDormitory}
+          <BieuDoKhungGio
+            tieuDe={TIEU_DE_BIEU_DO[khungThoiGian]}
+            duLieu={thongKeKhungThoiGian}
+            dangTai={dangTai}
+            laKtx={laKtx}
           />
         </div>
-        <TimeframeTable data={timeframeStats} loading={isLoading} isDormitory={isDormitory} />
+        <BangChiTietRaVao duLieu={thongKeKhungThoiGian} dangTai={dangTai} laKtx={laKtx} />
       </div>
 
+      {/* Các bảng thống kê phụ: Top sinh viên đi lại & Sinh viên vắng mặt */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <StatisticTable
-          title="Top sinh viên ra vào nhiều nhất"
-          dataSource={topStudents}
-          rowKey="mssv"
-          loading={isLoading}
-          columns={topStudentColumns}
+        <BangThongKeChung
+          tieuDe="Top sinh viên ra vào nhiều nhất"
+          nguonDuLieu={topSinhVien}
+          khoaDong="mssv"
+          dangTai={dangTai}
+          cacCot={cotBangSinhVienRaVaoNhieu}
         />
-        <StatisticTable
-          title="Sinh viên vắng mặt lâu ngày"
-          dataSource={absentStudents}
-          rowKey="mssv"
-          loading={isLoading}
-          columns={absentStudentColumns}
+        <BangThongKeChung
+          tieuDe="Sinh viên vắng mặt lâu ngày"
+          nguonDuLieu={sinhVienVangMat}
+          khoaDong="mssv"
+          dangTai={dangTai}
+          cacCot={cotBangSinhVienVangMat}
         />
       </div>
 
+      {/* Các bảng thống kê phụ: Người lạ phát hiện & Sinh viên bị hạn chế */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <StatisticTable
-          title="Người lạ phát hiện"
-          dataSource={strangerStats}
-          rowKey="date"
-          loading={isLoading}
-          columns={strangerStatsColumns}
+        <BangThongKeChung
+          tieuDe="Người lạ phát hiện"
+          nguonDuLieu={thongKeNguoiLa}
+          khoaDong="ngay"
+          dangTai={dangTai}
+          cacCot={cotBangNguoiLa}
         />
-        <StatisticTable
-          title="Sinh viên bị hạn chế"
-          dataSource={bannedStudentStats}
-          rowKey="mssv"
-          loading={isLoading}
-          columns={bannedStudentStatsColumns}
+        <BangThongKeChung
+          tieuDe="Sinh viên bị hạn chế"
+          nguonDuLieu={thongKeSinhVienBiHanChe}
+          khoaDong="mssv"
+          dangTai={dangTai}
+          cacCot={cotBangSinhVienBiHanChe}
         />
       </div>
-    </MainLayout>
+    </BoCucChinh>
   );
 }
+

@@ -1,0 +1,115 @@
+'use client';
+
+import React from 'react';
+import { Card, Descriptions, Image as AntdImage, Button } from 'antd';
+import DrawerUngDung from '../common/DrawerUngDung';
+import { dungKhoLichSu } from '../../store/khoLichSu';
+import NhanTrangThai from '../common/NhanTrangThai';
+
+/**
+ * Component Ngăn kéo hiển thị thông tin chi tiết lượt ra vào (DrawerChiTietLichSu).
+ * Chức năng: Lấy thông tin bản ghi lịch sử được chọn từ Zustand store và hiển thị chi tiết (ảnh sinh viên, ảnh chụp camera, thông tin cá nhân).
+ */
+export const DrawerChiTietLichSu: React.FC = () => {
+  // Trích xuất các trạng thái cần thiết từ store lịch sử ra vào
+  const { moDrawerChiTiet, datMoDrawerChiTiet, lichSuDuocChon } = dungKhoLichSu();
+
+  // Nếu không có bản ghi nào được chọn thì không hiển thị gì
+  if (!lichSuDuocChon) {
+    return null;
+  }
+
+  return (
+    <DrawerUngDung
+      title="Chi tiết Lịch sử Ra/Vào"
+      open={moDrawerChiTiet}
+      onClose={() => {
+        return datMoDrawerChiTiet(false);
+      }}
+      width={600}
+      footer={
+        <div className="flex justify-end">
+          <Button
+            onClick={() => {
+              return datMoDrawerChiTiet(false);
+            }}
+            className="rounded-lg"
+          >
+            Đóng cửa sổ
+          </Button>
+        </div>
+      }
+    >
+      <div className="space-y-6">
+        {/* Phần so sánh ảnh chân dung giữa hồ sơ và camera thực tế */}
+        <div className="grid grid-cols-2 gap-4">
+          <Card
+            title={<span className="text-xs font-bold text-zinc-500">Ảnh Hồ sơ Sinh viên</span>}
+            variant="borderless"
+            className="bg-zinc-50/50 border border-zinc-100 rounded-lg overflow-hidden text-center"
+            styles={{ body: { padding: '12px' } }}
+          >
+            <AntdImage
+              src={lichSuDuocChon.duongDanAnhDaiDien || 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=250'}
+              alt="Hồ sơ"
+              className="rounded-md object-cover max-h-[180px] mx-auto"
+            />
+          </Card>
+
+          <Card
+            title={<span className="text-xs font-bold text-zinc-500">Ảnh chụp Camera</span>}
+            variant="borderless"
+            className="bg-zinc-50/50 border border-zinc-100 rounded-lg overflow-hidden text-center"
+            styles={{ body: { padding: '12px' } }}
+          >
+            <AntdImage
+              src={lichSuDuocChon.duongDanAnhChup || 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=250'}
+              alt="Camera chụp"
+              className="rounded-md object-cover max-h-[180px] mx-auto"
+            />
+          </Card>
+        </div>
+
+        {/* Thông tin mô tả chi tiết của sự kiện ra vào */}
+        <Card variant="borderless" className="border border-zinc-100 rounded-lg shadow-2xs">
+          <Descriptions
+            title="Thông tin chi tiết"
+            column={1}
+            bordered
+            size="small"
+            labelStyle={{ fontWeight: 600, width: '150px' }}
+          >
+            <Descriptions.Item label="Mã số sinh viên (MSSV)">
+              <span className="font-mono font-bold text-zinc-700">{lichSuDuocChon.mssv}</span>
+            </Descriptions.Item>
+            <Descriptions.Item label="Họ và tên">
+              <span className="font-bold text-zinc-800">{lichSuDuocChon.hoVaTen}</span>
+            </Descriptions.Item>
+            <Descriptions.Item label="Khu ký túc xá">
+              {lichSuDuocChon.tenKtx}
+            </Descriptions.Item>
+            <Descriptions.Item label="Phòng sinh hoạt">
+              {lichSuDuocChon.tenPhong}
+            </Descriptions.Item>
+            <Descriptions.Item label="Loại sự kiện">
+              <NhanTrangThai trangThai={lichSuDuocChon.loai} />
+            </Descriptions.Item>
+            <Descriptions.Item label="Thời gian ghi nhận">
+              {lichSuDuocChon.thoiGian}
+            </Descriptions.Item>
+            <Descriptions.Item label="Thiết bị ghi nhận">
+              {lichSuDuocChon.thietBi}
+            </Descriptions.Item>
+            <Descriptions.Item label="Ghi chú hệ thống">
+              <span className="text-zinc-500 italic text-xs">
+                {lichSuDuocChon.ghiChu || 'Không có ghi chú thêm.'}
+              </span>
+            </Descriptions.Item>
+          </Descriptions>
+        </Card>
+      </div>
+    </DrawerUngDung>
+  );
+};
+
+export default DrawerChiTietLichSu;

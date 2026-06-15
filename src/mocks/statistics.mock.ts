@@ -1,86 +1,94 @@
 import {
-  AccessStatsByTime,
-  AccessStatsByDormitory,
-  TopAccessStudent,
-  LongAbsentStudent,
-  StrangerDetectionStats,
-  BannedStudentStats
-} from '../types/Statistic';
+  ThongKeRaVaoTheoThoiGian,
+  ThongKeRaVaoTheoKtx,
+  SinhVienRaVaoNhieuNhat,
+  SinhVienVangMatLauNgay,
+  ThongKePhatHienNguoiLa,
+  ThongKeSinhVienBiHanChe
+} from '../types/ThongKe';
 
-export const mockStatsByDay: AccessStatsByTime[] = [
-  { label: 'Thứ 2', inCount: 420, outCount: 400 },
-  { label: 'Thứ 3', inCount: 480, outCount: 490 },
-  { label: 'Thứ 4', inCount: 510, outCount: 500 },
-  { label: 'Thứ 5', inCount: 460, outCount: 470 },
-  { label: 'Thứ 6', inCount: 650, outCount: 720 },
-  { label: 'Thứ 7', inCount: 800, outCount: 850 },
-  { label: 'Chủ Nhật', inCount: 750, outCount: 600 },
+// Dữ liệu giả lập thống kê lượt ra vào theo ngày trong tuần
+export const duLieuGiaLapThongKeTheoNgay: ThongKeRaVaoTheoThoiGian[] = [
+  { nhan: 'Thứ 2', luotVao: 420, luotRa: 400 },
+  { nhan: 'Thứ 3', luotVao: 480, luotRa: 490 },
+  { nhan: 'Thứ 4', luotVao: 510, luotRa: 500 },
+  { nhan: 'Thứ 5', luotVao: 460, luotRa: 470 },
+  { nhan: 'Thứ 6', luotVao: 650, luotRa: 720 },
+  { nhan: 'Thứ 7', luotVao: 800, luotRa: 850 },
+  { nhan: 'Chủ Nhật', luotVao: 750, luotRa: 600 },
 ];
 
-export const mockStatsByMonth: AccessStatsByTime[] = [
-  { label: 'Tháng 1', inCount: 12000, outCount: 11800 },
-  { label: 'Tháng 2', inCount: 9500, outCount: 9300 },
-  { label: 'Tháng 3', inCount: 14000, outCount: 13900 },
-  { label: 'Tháng 4', inCount: 13500, outCount: 13600 },
-  { label: 'Tháng 5', inCount: 15000, outCount: 15200 },
-  { label: 'Tháng 6', inCount: 8000, outCount: 8200 }, // Đến thời điểm hiện tại
+// Dữ liệu giả lập thống kê lượt ra vào theo các tháng trong năm
+export const duLieuGiaLapThongKeTheoThang: ThongKeRaVaoTheoThoiGian[] = [
+  { nhan: 'Tháng 1', luotVao: 12000, luotRa: 11800 },
+  { nhan: 'Tháng 2', luotVao: 9500, luotRa: 9300 },
+  { nhan: 'Tháng 3', luotVao: 14000, luotRa: 13900 },
+  { nhan: 'Tháng 4', luotVao: 13500, luotRa: 13600 },
+  { nhan: 'Tháng 5', luotVao: 15000, luotRa: 15200 },
+  { nhan: 'Tháng 6', luotVao: 8000, luotRa: 8200 }, // Đến thời điểm hiện tại
 ];
 
-export const mockStatsByYear: AccessStatsByTime[] = [
-  { label: '2023', inCount: 145000, outCount: 143000 },
-  { label: '2024', inCount: 168000, outCount: 167000 },
-  { label: '2025', inCount: 180000, outCount: 179500 },
+// Dữ liệu giả lập thống kê lượt ra vào theo năm
+export const duLieuGiaLapThongKeTheoNam: ThongKeRaVaoTheoThoiGian[] = [
+  { nhan: '2023', luotVao: 145000, luotRa: 143000 },
+  { nhan: '2024', luotVao: 168000, luotRa: 167000 },
+  { nhan: '2025', luotVao: 180000, luotRa: 179500 },
 ];
 
-export const mockStatsByDormitory: AccessStatsByDormitory[] = [
-  { dormitoryName: 'Khu A', inCount: 4500, outCount: 4400, totalAccess: 8900 },
-  { dormitoryName: 'Khu B', inCount: 3800, outCount: 3750, totalAccess: 7550 },
-  { dormitoryName: 'Khu C', inCount: 5200, outCount: 5100, totalAccess: 10300 },
-  { dormitoryName: 'Khu D', inCount: 2900, outCount: 2950, totalAccess: 5850 },
+// Dữ liệu giả lập thống kê lượt ra vào theo dãy nhà ký túc xá
+export const duLieuGiaLapThongKeTheoKtx: ThongKeRaVaoTheoKtx[] = [
+  { tenKtx: 'Khu A', luotVao: 4500, luotRa: 4400, tongLuotRaVao: 8900 },
+  { tenKtx: 'Khu B', luotVao: 3800, luotRa: 3750, tongLuotRaVao: 7550 },
+  { tenKtx: 'Khu C', luotVao: 5200, luotRa: 5100, tongLuotRaVao: 10300 },
+  { tenKtx: 'Khu D', luotVao: 2900, luotRa: 2950, tongLuotRaVao: 5850 },
 ];
 
-export const mockTopAccessStudents: TopAccessStudent[] = [
-  { mssv: 'B2003789', fullName: 'Nguyễn Văn Nam', dormitoryName: 'Khu A', roomName: 'Phòng A101', accessCount: 42 },
-  { mssv: 'B2104567', fullName: 'Hoàng Ngọc Ánh', dormitoryName: 'Khu C', roomName: 'Phòng C101', accessCount: 38 },
-  { mssv: 'B2003791', fullName: 'Lê Minh Hải', dormitoryName: 'Khu B', roomName: 'Phòng B101', accessCount: 35 },
-  { mssv: 'B2104568', fullName: 'Vũ Quốc Khánh', dormitoryName: 'Khu D', roomName: 'Phòng D101', accessCount: 30 },
-  { mssv: 'B2003790', fullName: 'Trần Thị Hoa', dormitoryName: 'Khu A', roomName: 'Phòng A102', accessCount: 28 },
+// Dữ liệu giả lập top sinh viên có số lượt ra vào nhiều nhất
+export const duLieuGiaLapSinhVienRaVaoNhieuNhat: SinhVienRaVaoNhieuNhat[] = [
+  { mssv: 'B2003789', hoVaTen: 'Nguyễn Văn Nam', tenKtx: 'Khu A', tenPhong: 'Phòng A101', soLuotRaVao: 42 },
+  { mssv: 'B2104567', hoVaTen: 'Hoàng Ngọc Ánh', tenKtx: 'Khu C', tenPhong: 'Phòng C101', soLuotRaVao: 38 },
+  { mssv: 'B2003791', hoVaTen: 'Lê Minh Hải', tenKtx: 'Khu B', tenPhong: 'Phòng B101', soLuotRaVao: 35 },
+  { mssv: 'B2104568', hoVaTen: 'Vũ Quốc Khánh', tenKtx: 'Khu D', tenPhong: 'Phòng D101', soLuotRaVao: 30 },
+  { mssv: 'B2003790', hoVaTen: 'Trần Thị Hoa', tenKtx: 'Khu A', tenPhong: 'Phòng A102', soLuotRaVao: 28 },
 ];
 
-export const mockLongAbsentStudents: LongAbsentStudent[] = [
-  { mssv: 'B2003792', fullName: 'Phạm Thanh Bình', dormitoryName: 'Khu A', roomName: 'Phòng A101', lastAccessTime: '2026-06-10 11:30:20', daysAbsent: 3 },
-  { mssv: 'B2104569', fullName: 'Đặng Thùy Linh', dormitoryName: 'Khu B', roomName: 'Phòng B102', lastAccessTime: '2026-06-08 15:40:00', daysAbsent: 5 },
-  { mssv: 'B2003810', fullName: 'Nguyễn Văn Cường', dormitoryName: 'Khu C', roomName: 'Phòng C102', lastAccessTime: '2026-05-30 08:20:00', daysAbsent: 14 },
+// Dữ liệu giả lập sinh viên vắng mặt dài ngày khỏi ký túc xá
+export const duLieuGiaLapSinhVienVangMatLauNgay: SinhVienVangMatLauNgay[] = [
+  { mssv: 'B2003792', hoVaTen: 'Phạm Thanh Bình', tenKtx: 'Khu A', tenPhong: 'Phòng A101', thoiGianRaVaoCuoi: '2026-06-10 11:30:20', soNgayVangMat: 3 },
+  { mssv: 'B2104569', hoVaTen: 'Đặng Thùy Linh', tenKtx: 'Khu B', tenPhong: 'Phòng B102', thoiGianRaVaoCuoi: '2026-06-08 15:40:00', soNgayVangMat: 5 },
+  { mssv: 'B2003810', hoVaTen: 'Nguyễn Văn Cường', tenKtx: 'Khu C', tenPhong: 'Phòng C102', thoiGianRaVaoCuoi: '2026-05-30 08:20:00', soNgayVangMat: 14 },
 ];
 
-export const mockStrangerStats: StrangerDetectionStats[] = [
+// Dữ liệu giả lập thống kê số lần camera phát hiện người lạ
+export const duLieuGiaLapThongKeNguoiLa: ThongKePhatHienNguoiLa[] = [
   {
-    date: '2026-06-13',
-    count: 3,
-    locations: [{ name: 'Cửa sau Khu B', count: 2 }, { name: 'Cổng chính Khu A', count: 1 }]
+    ngay: '2026-06-13',
+    soLuong: 3,
+    cacViTri: [{ ten: 'Cửa sau Khu B', soLuong: 2 }, { ten: 'Cổng chính Khu A', soLuong: 1 }]
   },
   {
-    date: '2026-06-12',
-    count: 6,
-    locations: [{ name: 'Cửa sau Khu B', count: 3 }, { name: 'Hành lang Khu C', count: 2 }, { name: 'Cổng chính Khu D', count: 1 }]
+    ngay: '2026-06-12',
+    soLuong: 6,
+    cacViTri: [{ ten: 'Cửa sau Khu B', soLuong: 3 }, { ten: 'Hành lang Khu C', soLuong: 2 }, { ten: 'Cổng chính Khu D', soLuong: 1 }]
   },
 ];
 
-export const mockBannedStudentStats: BannedStudentStats[] = [
+// Dữ liệu giả lập thống kê sinh viên đang chịu kỷ luật hạn chế ra vào
+export const duLieuGiaLapThongKeSinhVienBiHanChe: ThongKeSinhVienBiHanChe[] = [
   {
     mssv: 'B2003792',
-    fullName: 'Phạm Thanh Bình',
-    reason: 'Vi phạm quy định giờ giới nghiêm nhiều lần (về muộn sau 23h)',
-    bannedDate: '2026-06-11',
-    expiryDate: '2026-06-25',
-    status: 'ACTIVE'
+    hoVaTen: 'Phạm Thanh Bình',
+    lyDo: 'Vi phạm quy định giờ giới nghiêm nhiều lần (về muộn sau 23h)',
+    ngayHanChe: '2026-06-11',
+    ngayHetHan: '2026-06-25',
+    trangThai: 'ACTIVE'
   },
   {
     mssv: 'B2003999',
-    fullName: 'Lê Văn Quyết',
-    reason: 'Gây mất trật tự, đánh nhau trong khu vực ký túc xá',
-    bannedDate: '2026-05-01',
-    expiryDate: '2026-06-01',
-    status: 'EXPIRED'
+    hoVaTen: 'Lê Văn Quyết',
+    lyDo: 'Gây mất trật tự, đánh nhau trong khu vực ký túc xá',
+    ngayHanChe: '2026-05-01',
+    ngayHetHan: '2026-06-01',
+    trangThai: 'EXPIRED'
   }
 ];
