@@ -1,0 +1,92 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f5f7fa;
+  --foreground: #171717;
+  --font-sans: var(--font-readex-pro), Arial, Helvetica, sans-serif;
+  --font-mono: "Cascadia Mono", Consolas, monospace;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+}
+
+.ant-table-wrapper .ant-table-thead > tr > th {
+  background: #f5f7fa;
+  color: #334155;
+  font-weight: 700;
+}
+
+.ant-menu-item-selected {
+  background-color: #00afef18 !important;
+  color: #00afef !important;
+}
+
+.ant-menu-item-selected .ant-menu-item-icon {
+  color: #00afef !important;
+}
+
+h1, h2, h3, h4, h5, h6,
+.ant-typography-title,
+.ant-card-head-title,
+.ant-descriptions-title,
+.ant-modal-title,
+.ant-drawer-title,
+.ant-card-title,
+.card-title,
+.chart-title,
+.table-title,
+.page-title {
+  font-family: var(--font-k2d), sans-serif !important;
+}
+
+/* Tối ưu hóa kích thước bảng nhỏ trên Dashboard */
+.ant-table-size-small .ant-table-thead > tr > th,
+.ant-table-size-small .ant-table-tbody > tr > td {
+  padding: 6px 10px !important;
+  font-size: 11px !important;
+}
+
+/* Tối ưu hóa bảng Ant Design toàn hệ thống: 
+   Đẩy thanh cuộn ngang cố định xuống sát cạnh đáy của Card/Vùng chứa bao ngoài 
+   khi bảng có ít dữ liệu (áp dụng cho tất cả các trang) */
+.ant-table-wrapper {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  min-height: 0;
+  height: 100%;
+}
+
+.ant-table-wrapper .ant-spin-nested-loading,
+.ant-table-wrapper .ant-spin-container,
+.ant-table-wrapper .ant-table,
+.ant-table-wrapper .ant-table-container {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  min-height: 0;
+}
+
+.ant-table-wrapper .ant-table-content,
+.ant-table-wrapper .ant-table-body {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  min-height: 0;
+  justify-content: space-between;
+}
+
