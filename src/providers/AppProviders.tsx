@@ -6,6 +6,7 @@ import { ConfigProvider, App } from 'antd';
 import viVN from 'antd/locale/vi_VN';
 import { ctuTheme } from '@/lib/theme';
 import { dungKhoXacThuc } from '@/store/khoXacThuc';
+import { MantineProvider } from '@mantine/core';
 
 interface AppProvidersProps {
   children: React.ReactNode;
@@ -32,11 +33,13 @@ export default function AppProviders({ children }: AppProvidersProps) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ConfigProvider locale={viVN} theme={ctuTheme}>
-        <App>
-          {children}
-        </App>
-      </ConfigProvider>
+      <MantineProvider>
+        <ConfigProvider locale={viVN} theme={ctuTheme}>
+          <App>
+            {children}
+          </App>
+        </ConfigProvider>
+      </MantineProvider>
     </QueryClientProvider>
   );
 }

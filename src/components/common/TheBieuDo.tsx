@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Card, Spin } from 'antd';
+import { Card, LoadingOverlay } from '@mantine/core';
 
 // Định nghĩa giao diện thuộc tính cho Thẻ biểu đồ chứa các Recharts
 interface ThuocTinhTheBieuDo {
@@ -29,7 +29,7 @@ interface ThuocTinhTheBieuDo {
 
 /**
  * Component Thẻ bao bọc biểu đồ thống kê.
- * Chức năng: Đóng vai trò là một container chuẩn hóa, hỗ trợ tiêu đề, tiêu đề phụ, các nút hành động bổ sung và trạng thái xoay tải dữ liệu (Spin).
+ * Chức năng: Đóng vai trò là một container chuẩn hóa, hỗ trợ tiêu đề, tiêu đề phụ, các nút hành động bổ sung và trạng thái xoay tải dữ liệu (LoadingOverlay).
  */
 export const TheBieuDo: React.FC<ThuocTinhTheBieuDo> = ({
   tieuDe,
@@ -42,22 +42,26 @@ export const TheBieuDo: React.FC<ThuocTinhTheBieuDo> = ({
 }) => {
   return (
     <Card
-      title={
+      radius="xl"
+      p="lg"
+      className={`shadow-xs border border-zinc-100 bg-white overflow-hidden ${tenLop}`}
+      style={{ position: 'relative' }}
+    >
+      <LoadingOverlay visible={dangTai} overlayProps={{ blur: 1 }} />
+      
+      {/* Header Section */}
+      <div className="flex justify-between items-center pb-4 mb-4 border-b border-zinc-50">
         <div className="flex flex-col">
-          <span className="text-zinc-800 font-bold text-base tracking-tight">{tieuDe}</span>
+          <span className="text-zinc-800 font-bold text-base tracking-tight font-sans uppercase">{tieuDe}</span>
           {phuDe && <span className="text-zinc-400 font-normal text-xs mt-0.5">{phuDe}</span>}
         </div>
-      }
-      extra={boSung}
-      variant="borderless"
-      className={`shadow-xs border border-zinc-100 rounded-xl overflow-hidden ${tenLop}`}
-      styles={{ body: { padding: '16px 20px' } }}
-    >
-      <Spin spinning={dangTai}>
-        <div style={{ height: `${chieuCao}px`, width: '100%' }} className="flex items-center justify-center">
-          {children}
-        </div>
-      </Spin>
+        {boSung && <div>{boSung}</div>}
+      </div>
+
+      {/* Main Body */}
+      <div style={{ height: `${chieuCao}px`, width: '100%' }} className="flex items-center justify-center">
+        {children}
+      </div>
     </Card>
   );
 };

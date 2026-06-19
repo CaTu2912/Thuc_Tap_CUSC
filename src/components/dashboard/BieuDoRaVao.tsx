@@ -1,11 +1,11 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import TheBieuDo from '../common/TheBieuDo';
 import { DuLieuBieuDoRaVao } from '../../types/BangDieuKhien';
-import { Radio, DatePicker } from 'antd';
-import dayjs from 'dayjs';
+import { SegmentedControl } from '@mantine/core';
+import { DatePickerInput } from '@mantine/dates';
 
 // Định nghĩa giao diện thuộc tính cho Biểu đồ tần suất ra vào theo giờ
 interface ThuocTinhBieuDoRaVao {
@@ -21,21 +21,32 @@ interface ThuocTinhBieuDoRaVao {
  * Chức năng: Vẽ biểu đồ cột (Bar Chart) so sánh lượng sinh viên quét thẻ đi vào và đi ra trong ngày.
  */
 export const BieuDoRaVao: React.FC<ThuocTinhBieuDoRaVao> = ({ duLieu = [], dangTai = false }) => {
-  // Phần bộ lọc thời gian hiển thị ở góc phải tiêu đề biểu đồ
+  const [kieuXem, setKieuXem] = useState<string>('DAY');
+  const [ngayChon, setNgayChon] = useState<Date | null>(new Date('2026-06-01'));
+
+  // Phần bộ lọc thời gian hiển thị ở góc phải tiêu đề biểu đồ dùng Mantine UI
   const boLocThoiGian = (
     <div className="flex items-center gap-3">
-      <Radio.Group defaultValue="DAY" size="small" className="rounded-lg font-sans">
-        <Radio.Button value="DAY">Ngày</Radio.Button>
-        <Radio.Button value="MONTH">Tháng</Radio.Button>
-        <Radio.Button value="YEAR">Năm</Radio.Button>
-      </Radio.Group>
-      <DatePicker 
-        defaultValue={dayjs('2026-06-01')} 
-        format="DD/MM/YYYY" 
-        size="small" 
-        style={{ width: 125 }} 
-        className="rounded-lg font-sans" 
-        allowClear={false}
+      <SegmentedControl
+        value={kieuXem}
+        onChange={setKieuXem}
+        data={[
+          { label: 'Ngày', value: 'DAY' },
+          { label: 'Tháng', value: 'MONTH' },
+          { label: 'Năm', value: 'YEAR' },
+        ]}
+        size="xs"
+        radius="md"
+      />
+      <DatePickerInput
+        value={ngayChon}
+        onChange={(val: any) => {
+          setNgayChon(val);
+        }}
+        valueFormat="DD/MM/YYYY"
+        size="xs"
+        radius="md"
+        style={{ width: 125 }}
       />
     </div>
   );

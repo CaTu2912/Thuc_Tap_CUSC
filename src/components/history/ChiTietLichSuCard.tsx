@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Button } from 'antd';
+import { Button } from '@mantine/core';
 import { LichSuRaVao } from '../../types/LichSuRaVao';
 import { layNhanTrangThai } from './BangLichSu';
 import type { LoaiTabHienThi } from './BangLichSu';
@@ -109,10 +109,9 @@ export const ChiTietLichSuCard: React.FC<ThuocTinhChiTietLichSuCard> = ({
       {/* Nút thao tác */}
       <div className="mt-auto pt-3 border-t border-zinc-100">
         <Button
-          type="primary"
-          block
           onClick={() => khiPhanHoi(lichSuDuocChon)}
-          className="bg-[#00afef] hover:bg-[#0092c7] border-none text-white text-sm font-semibold h-9 rounded-md"
+          className="bg-[#00afef] hover:bg-[#0092c7] border-none text-white text-sm font-semibold h-9 rounded-md w-full cursor-pointer"
+          style={{ backgroundColor: '#00afef' }}
         >
           Phản hồi sai thông tin
         </Button>

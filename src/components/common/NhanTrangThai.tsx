@@ -1,8 +1,14 @@
 'use client';
 
 import React from 'react';
-import { Tag } from 'antd';
-import { CheckCircleOutlined, CloseCircleOutlined, ExclamationCircleOutlined, LoginOutlined, LogoutOutlined } from '@ant-design/icons';
+import { Badge } from '@mantine/core';
+import {
+  IconCircleCheck,
+  IconAlertCircle,
+  IconX,
+  IconLogin,
+  IconLogout,
+} from '@tabler/icons-react';
 
 // Định nghĩa giao diện thuộc tính cho nhãn hiển thị trạng thái
 interface ThuocTinhNhanTrangThai {
@@ -11,51 +17,76 @@ interface ThuocTinhNhanTrangThai {
 }
 
 /**
- * Component hiển thị nhãn trạng thái (Tag) được chuẩn hóa màu sắc.
+ * Component hiển thị nhãn trạng thái (Badge) được chuẩn hóa màu sắc.
  * Chức năng: Chuyển đổi các trạng thái hệ thống (ACTIVE, BANNED, IN, OUT,...) thành nhãn tiếng Việt trực quan kèm biểu tượng.
  */
 export const NhanTrangThai: React.FC<ThuocTinhNhanTrangThai> = ({ trangThai }) => {
+  let color = 'gray';
+  let label = trangThai;
+  let icon = null;
+
   switch (trangThai) {
     case 'ACTIVE':
+      color = 'green';
+      label = 'Hoạt động';
+      icon = <IconCircleCheck size={12} />;
+      break;
     case 'RESOLVED':
-      return (
-        <Tag color="#52C41A" icon={<CheckCircleOutlined />} className="px-2.5 py-0.5 rounded-full font-medium flex items-center w-fit gap-1">
-          {trangThai === 'ACTIVE' ? 'Hoạt động' : 'Đã xử lý'}
-        </Tag>
-      );
+      color = 'green';
+      label = 'Đã xử lý';
+      icon = <IconCircleCheck size={12} />;
+      break;
     case 'INACTIVE':
-      return (
-        <Tag color="#FAAD14" icon={<ExclamationCircleOutlined />} className="px-2.5 py-0.5 rounded-full font-medium flex items-center w-fit gap-1">
-          Tạm khóa
-        </Tag>
-      );
+      color = 'yellow';
+      label = 'Tạm khóa';
+      icon = <IconAlertCircle size={12} />;
+      break;
     case 'BANNED':
-      return (
-        <Tag color="#FF4D4F" icon={<CloseCircleOutlined />} className="px-2.5 py-0.5 rounded-full font-medium flex items-center w-fit gap-1">
-          Bị cấm
-        </Tag>
-      );
+      color = 'red';
+      label = 'Bị cấm';
+      icon = <IconX size={12} />;
+      break;
     case 'PENDING':
-      return (
-        <Tag color="#FAAD14" icon={<ExclamationCircleOutlined />} className="px-2.5 py-0.5 rounded-full font-medium flex items-center w-fit gap-1">
-          Chờ xử lý
-        </Tag>
-      );
+      color = 'yellow';
+      label = 'Chờ xử lý';
+      icon = <IconAlertCircle size={12} />;
+      break;
     case 'IN':
-      return (
-        <Tag color="#52C41A" icon={<LoginOutlined />} className="px-2.5 py-0.5 rounded-full font-medium flex items-center w-fit gap-1">
-          VÀO
-        </Tag>
-      );
+      color = 'green';
+      label = 'VÀO';
+      icon = <IconLogin size={12} />;
+      break;
     case 'OUT':
-      return (
-        <Tag color="#1f5ca9" icon={<LogoutOutlined />} className="px-2.5 py-0.5 rounded-full font-medium flex items-center w-fit gap-1">
-          RA
-        </Tag>
-      );
+      color = 'blue';
+      label = 'RA';
+      icon = <IconLogout size={12} />;
+      break;
     default:
-      return <Tag className="px-2.5 py-0.5 rounded-full font-medium">{trangThai}</Tag>;
+      break;
   }
+
+  return (
+    <Badge
+      leftSection={icon}
+      color={color}
+      variant="light"
+      radius="xl"
+      styles={{
+        root: {
+          fontWeight: 600,
+          textTransform: 'none',
+          padding: '4px 10px',
+          height: 'auto',
+          fontSize: '11px',
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '4px',
+        },
+      }}
+    >
+      {label}
+    </Badge>
+  );
 };
 
 export default NhanTrangThai;

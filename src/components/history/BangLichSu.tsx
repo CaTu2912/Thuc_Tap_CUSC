@@ -1,17 +1,17 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Table, Avatar, Select } from 'antd';
+import { Table, Avatar, Select, Box } from '@mantine/core';
 import {
-  ArrowRightOutlined,
-  ArrowLeftOutlined,
-  CloseCircleOutlined,
-  UserOutlined,
-  StopOutlined,
-  CheckCircleOutlined,
-  ClockCircleOutlined,
-} from '@ant-design/icons';
-import { ColumnsType } from 'antd/es/table';
+  IconArrowRight,
+  IconArrowLeft,
+  IconCircleX,
+  IconUser,
+  IconBan,
+  IconCircleCheck,
+  IconClock,
+  IconChevronDown,
+} from '@tabler/icons-react';
 import { LichSuRaVao } from '../../types/LichSuRaVao';
 import { dungKhoLichSu } from '../../store/khoLichSu';
 import dayjs from 'dayjs';
@@ -29,6 +29,10 @@ interface ThuocTinhBangLichSu {
 
   // Loại tab hiện tại để điều chỉnh cột Loại
   loaiTab?: LoaiTabHienThi;
+
+  // Props truyền từ cha (optional) để tránh lỗi kiểu
+  lichSuDuocChon?: LichSuRaVao | null;
+  datLichSuDuocChon?: (lichSu: LichSuRaVao | null) => void;
 }
 
 /**
@@ -40,7 +44,7 @@ const renderCotLoai = (banGhi: LichSuRaVao, loaiTab: LoaiTabHienThi) => {
   if (loaiTab === 'CO_MAT') {
     return (
       <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600">
-        <CheckCircleOutlined className="text-[13px]" /> Có mặt
+        <IconCircleCheck size={14} /> Có mặt
       </span>
     );
   }
@@ -48,7 +52,7 @@ const renderCotLoai = (banGhi: LichSuRaVao, loaiTab: LoaiTabHienThi) => {
   if (loaiTab === 'VANG_MAT') {
     return (
       <span className="inline-flex items-center gap-1 text-xs font-semibold text-amber-500">
-        <ClockCircleOutlined className="text-[13px]" /> Vắng
+        <IconClock size={14} /> Vắng
       </span>
     );
   }
@@ -57,7 +61,7 @@ const renderCotLoai = (banGhi: LichSuRaVao, loaiTab: LoaiTabHienThi) => {
   if (banGhi.loaiDoiTuong === 'Người lạ') {
     return (
       <span className="inline-flex items-center gap-1 text-xs font-semibold text-red-500">
-        <CloseCircleOutlined className="text-[13px] text-red-500" /> Người lạ
+        <IconCircleX size={14} className="text-red-500" /> Người lạ
       </span>
     );
   }
@@ -65,7 +69,7 @@ const renderCotLoai = (banGhi: LichSuRaVao, loaiTab: LoaiTabHienThi) => {
   if (banGhi.trangThaiSinhVien === 'NO_PHI') {
     return (
       <span className="inline-flex items-center gap-1 text-xs font-semibold text-blue-500">
-        <UserOutlined className="text-[13px]" /> Nợ phí
+        <IconUser size={14} /> Nợ phí
       </span>
     );
   }
@@ -73,7 +77,7 @@ const renderCotLoai = (banGhi: LichSuRaVao, loaiTab: LoaiTabHienThi) => {
   if (banGhi.trangThaiSinhVien === 'BI_CAM') {
     return (
       <span className="inline-flex items-center gap-1 text-xs font-semibold text-orange-600">
-        <StopOutlined className="text-[13px]" /> Bị cấm
+        <IconBan size={14} /> Bị cấm
       </span>
     );
   }
@@ -88,11 +92,11 @@ const renderCotLoai = (banGhi: LichSuRaVao, loaiTab: LoaiTabHienThi) => {
     >
       {laVao ? (
         <>
-          <ArrowRightOutlined className="text-[11px]" /> Vào
+          <IconArrowRight size={14} /> Vào
         </>
       ) : (
         <>
-          <ArrowLeftOutlined className="text-[11px]" /> Ra
+          <IconArrowLeft size={14} /> Ra
         </>
       )}
     </span>
@@ -134,81 +138,6 @@ export const BangLichSu: React.FC<ThuocTinhBangLichSu> = ({
   const danhSachHienThi = duLieu.slice(chiSoBatDau, chiSoKetThuc);
   const tongSoTrang = Math.ceil(duLieu.length / soDongTrenTrang);
 
-  // Định nghĩa các cột bảng theo đúng mockup
-  const cotBang: ColumnsType<LichSuRaVao> = [
-    {
-      title: 'STT',
-      key: 'stt',
-      width: 48,
-      align: 'center',
-      render: (_, __, chiSo) => (
-        <span className="font-medium text-zinc-600 text-sm">
-          {chiSoBatDau + chiSo + 1}
-        </span>
-      ),
-    },
-    {
-      title: 'Thời gian',
-      dataIndex: 'thoiGian',
-      key: 'thoiGian',
-      width: 145,
-      render: (thoiGian) => (
-        <span className="text-zinc-700 text-sm">
-          {dayjs(thoiGian).format('DD/MM/YYYY HH:mm:ss')}
-        </span>
-      ),
-    },
-    {
-      title: 'Họ tên',
-      dataIndex: 'hoVaTen',
-      key: 'hoVaTen',
-      width: 155,
-      render: (hoVaTen) => (
-        <span className="font-medium text-zinc-800 text-sm">{hoVaTen}</span>
-      ),
-    },
-    {
-      title: 'Hình ảnh',
-      dataIndex: 'duongDanAnhDaiDien',
-      key: 'hinhAnh',
-      width: 80,
-      align: 'center',
-      render: (duongDan) => (
-        <Avatar
-          src={duongDan}
-          shape="square"
-          size={44}
-          icon={<UserOutlined />}
-          className="rounded-md border border-zinc-100 shrink-0"
-        />
-      ),
-    },
-    {
-      title: 'Loại',
-      key: 'loai',
-      width: 110,
-      render: (_, banGhi) => renderCotLoai(banGhi, loaiTab),
-    },
-    {
-      title: 'KTX',
-      dataIndex: 'tenKtx',
-      key: 'tenKtx',
-      width: 75,
-      render: (tenKtx) => (
-        <span className="text-zinc-700 text-sm font-medium">{tenKtx}</span>
-      ),
-    },
-    {
-      title: 'Phòng',
-      dataIndex: 'tenPhong',
-      key: 'tenPhong',
-      width: 80,
-      render: (tenPhong) => (
-        <span className="text-zinc-700 text-sm font-medium">{tenPhong}</span>
-      ),
-    },
-  ];
-
   // Hàm xử lý chuyển trang
   const xuLyChuyenTrang = (soTrangMoi: number) => {
     if (soTrangMoi >= 1 && soTrangMoi <= tongSoTrang) {
@@ -234,25 +163,70 @@ export const BangLichSu: React.FC<ThuocTinhBangLichSu> = ({
   return (
     <div className="bg-white rounded-xl border border-zinc-200 overflow-hidden shadow-sm">
       {/* BẢNG DỮ LIỆU */}
-      <Table<LichSuRaVao>
-        columns={cotBang}
-        dataSource={danhSachHienThi}
-        loading={dangTai}
-        rowKey="id"
-        pagination={false}
-        size="middle"
-        scroll={{ x: 600 }}
-        onRow={(banGhi) => ({
-          onClick: () => datLichSuDuocChon(banGhi),
-        })}
-        rowClassName={(banGhi) => {
-          const laDuocChon = lichSuDuocChon?.id === banGhi.id;
-          return `cursor-pointer transition-colors duration-150 hover:bg-zinc-50 ${
-            laDuocChon ? 'bg-blue-50' : ''
-          }`;
-        }}
-        className="text-sm"
-      />
+      <div className="overflow-x-auto">
+        <Table highlightOnHover verticalSpacing="sm" horizontalSpacing="md" className="min-w-[600px] text-sm">
+          <Table.Thead className="bg-zinc-50 border-b border-zinc-200">
+            <Table.Tr>
+              <Table.Th style={{ width: 48, textAlign: 'center' }}>STT</Table.Th>
+              <Table.Th style={{ width: 145 }}>Thời gian</Table.Th>
+              <Table.Th style={{ width: 155 }}>Họ tên</Table.Th>
+              <Table.Th style={{ width: 80, textAlign: 'center' }}>Hình ảnh</Table.Th>
+              <Table.Th style={{ width: 110 }}>Loại</Table.Th>
+              <Table.Th style={{ width: 75 }}>KTX</Table.Th>
+              <Table.Th style={{ width: 80 }}>Phòng</Table.Th>
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody>
+            {dangTai ? (
+              <Table.Tr>
+                <Table.Td colSpan={7} className="text-center py-6 text-zinc-500">
+                  Đang tải dữ liệu...
+                </Table.Td>
+              </Table.Tr>
+            ) : danhSachHienThi.length === 0 ? (
+              <Table.Tr>
+                <Table.Td colSpan={7} className="text-center py-6 text-zinc-500">
+                  Không có dữ liệu
+                </Table.Td>
+              </Table.Tr>
+            ) : (
+              danhSachHienThi.map((banGhi, index) => {
+                const laDuocChon = lichSuDuocChon?.id === banGhi.id;
+                return (
+                  <Table.Tr
+                    key={banGhi.id}
+                    onClick={() => datLichSuDuocChon(banGhi)}
+                    className={`cursor-pointer transition-colors duration-150 hover:bg-zinc-50 ${
+                      laDuocChon ? 'bg-blue-50/70' : ''
+                    }`}
+                  >
+                    <Table.Td style={{ textAlign: 'center' }} className="font-medium text-zinc-600 text-sm">
+                      {chiSoBatDau + index + 1}
+                    </Table.Td>
+                    <Table.Td className="text-zinc-700 text-sm">
+                      {dayjs(banGhi.thoiGian).format('DD/MM/YYYY HH:mm:ss')}
+                    </Table.Td>
+                    <Table.Td className="font-medium text-zinc-800 text-sm">{banGhi.hoVaTen}</Table.Td>
+                    <Table.Td style={{ textAlign: 'center' }}>
+                      <Box style={{ display: 'flex', justifyContent: 'center' }}>
+                        <Avatar
+                          src={banGhi.duongDanAnhDaiDien}
+                          radius="sm"
+                          size={44}
+                          className="border border-zinc-100 shrink-0"
+                        />
+                      </Box>
+                    </Table.Td>
+                    <Table.Td>{renderCotLoai(banGhi, loaiTab)}</Table.Td>
+                    <Table.Td className="text-zinc-700 text-sm font-medium">{banGhi.tenKtx}</Table.Td>
+                    <Table.Td className="text-zinc-700 text-sm font-medium">{banGhi.tenPhong}</Table.Td>
+                  </Table.Tr>
+                );
+              })
+            )}
+          </Table.Tbody>
+        </Table>
+      </div>
 
       {/* THANH PHÂN TRANG THEO MOCKUP */}
       <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-3 border-t border-zinc-200 bg-white">
@@ -268,7 +242,7 @@ export const BangLichSu: React.FC<ThuocTinhBangLichSu> = ({
           <button
             onClick={() => xuLyChuyenTrang(trangHienTai - 1)}
             disabled={trangHienTai === 1}
-            className="w-7 h-7 flex items-center justify-center rounded border border-zinc-300 text-zinc-500 text-sm hover:border-blue-500 hover:text-blue-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="w-7 h-7 flex items-center justify-center rounded border border-zinc-300 text-zinc-500 text-sm hover:border-blue-500 hover:text-blue-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
           >
             {'<'}
           </button>
@@ -288,9 +262,9 @@ export const BangLichSu: React.FC<ThuocTinhBangLichSu> = ({
               <button
                 key={soTrang}
                 onClick={() => xuLyChuyenTrang(soTrang)}
-                 className={`w-7 h-7 flex items-center justify-center rounded border text-sm transition-colors ${
+                className={`w-7 h-7 flex items-center justify-center rounded border text-sm transition-colors cursor-pointer ${
                   laHienTai
-                    ? 'bg-white text-[#00afef] border-[#00afef] font-semibold font-sans'
+                    ? 'bg-white text-[#00afef] border-[#00afef] font-semibold'
                     : 'border-zinc-300 text-zinc-600 hover:border-[#00afef] hover:text-[#00afef]'
                 }`}
               >
@@ -303,7 +277,7 @@ export const BangLichSu: React.FC<ThuocTinhBangLichSu> = ({
           <button
             onClick={() => xuLyChuyenTrang(trangHienTai + 1)}
             disabled={trangHienTai === tongSoTrang || tongSoTrang === 0}
-            className="w-7 h-7 flex items-center justify-center rounded border border-zinc-300 text-zinc-500 text-sm hover:border-[#00afef] hover:text-[#00afef] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="w-7 h-7 flex items-center justify-center rounded border border-zinc-300 text-zinc-500 text-sm hover:border-[#00afef] hover:text-[#00afef] disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
           >
             {'>'}
           </button>
@@ -311,16 +285,18 @@ export const BangLichSu: React.FC<ThuocTinhBangLichSu> = ({
 
         {/* Bộ chọn số dòng/trang */}
         <Select
-          value={soDongTrenTrang}
+          value={soDongTrenTrang.toString()}
           onChange={(giaTri) => {
-            datSoDongTrenTrang(giaTri);
+            datSoDongTrenTrang(Number(giaTri || '5'));
             datTrangHienTai(1);
           }}
-          size="small"
+          size="xs"
+          radius="md"
           style={{ width: 110 }}
-          options={[
-            { value: 5, label: '5 / Trang' },
-            { value: 10, label: '10 / Trang' },
+          rightSection={<IconChevronDown size={14} className="text-zinc-400 pointer-events-none" />}
+          data={[
+            { value: '5', label: '5 / Trang' },
+            { value: '10', label: '10 / Trang' },
           ]}
         />
       </div>

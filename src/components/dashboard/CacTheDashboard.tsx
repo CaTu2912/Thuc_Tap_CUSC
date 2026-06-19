@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { TeamOutlined, LoginOutlined, LogoutOutlined, DollarOutlined, StopOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
+import { IconUsers, IconLogin, IconLogout, IconCurrencyDollar, IconBan, IconEyeOff } from '@tabler/icons-react';
 import TheThongKe from '../common/TheThongKe';
 import { KpiBangDieuKhien } from '../../types/BangDieuKhien';
 
@@ -28,7 +28,7 @@ export const CacTheDashboard: React.FC<ThuocTinhCacTheDashboard> = ({
     nguoiLaPhatHienHomNay: 0,
   },
 }) => {
-  // Tính toán tỷ lệ phần trăm động dựa trên số liệu thực tế
+  // Tính toán tỷ lệ phần trạng động dựa trên số liệu thực tế
   const tongSV = chiSoKpi.tongSoSinhVien || 1; // Tránh chia cho 0
   const phanTramCoMat = ((chiSoKpi.sinhVienCoMat / tongSV) * 100).toFixed(1).replace('.', ',');
   const phanTramVangMat = ((chiSoKpi.sinhVienVangMat / tongSV) * 100).toFixed(1).replace('.', ',');
@@ -40,7 +40,7 @@ export const CacTheDashboard: React.FC<ThuocTinhCacTheDashboard> = ({
       <TheThongKe
         tieuDe="Tổng SV KTX"
         giaTri={chiSoKpi.tongSoSinhVien.toLocaleString('vi-VN')}
-        bieuTuong={<TeamOutlined />}
+        bieuTuong={<IconUsers size={18} />}
         mauSac="#1f5ca9" // Màu xanh dương CTU
         phuDe="Tổng số sinh viên"
         mauPhuDe="#A0AEC0"
@@ -48,7 +48,7 @@ export const CacTheDashboard: React.FC<ThuocTinhCacTheDashboard> = ({
       <TheThongKe
         tieuDe="Đang có mặt"
         giaTri={chiSoKpi.sinhVienCoMat.toLocaleString('vi-VN')}
-        bieuTuong={<LoginOutlined />}
+        bieuTuong={<IconLogin size={18} />}
         mauSac="#52C41A" // Màu xanh lá
         phuDe={`${phanTramCoMat}% tổng số SV`}
         mauPhuDe="#52C41A"
@@ -56,7 +56,7 @@ export const CacTheDashboard: React.FC<ThuocTinhCacTheDashboard> = ({
       <TheThongKe
         tieuDe="Đã ra ngoài"
         giaTri={chiSoKpi.sinhVienVangMat.toLocaleString('vi-VN')}
-        bieuTuong={<LogoutOutlined />}
+        bieuTuong={<IconLogout size={18} />}
         mauSac="#FAAD14" // Màu vàng cam
         phuDe={`${phanTramVangMat}% tổng số SV`}
         mauPhuDe="#ED8936"
@@ -64,7 +64,7 @@ export const CacTheDashboard: React.FC<ThuocTinhCacTheDashboard> = ({
       <TheThongKe
         tieuDe="Sinh viên nợ phí"
         giaTri={chiSoKpi.sinhVienNoPhi.toLocaleString('vi-VN')}
-        bieuTuong={<DollarOutlined />}
+        bieuTuong={<IconCurrencyDollar size={18} />}
         mauSac="#D69E2E" // Vàng đồng
         phuDe={`${phanTramNoPhi}% tổng số SV`}
         mauPhuDe="#A0AEC0"
@@ -72,7 +72,7 @@ export const CacTheDashboard: React.FC<ThuocTinhCacTheDashboard> = ({
       <TheThongKe
         tieuDe="Sinh viên bị cấm"
         giaTri={chiSoKpi.sinhVienBiHanChe.toLocaleString('vi-VN')}
-        bieuTuong={<StopOutlined />}
+        bieuTuong={<IconBan size={18} />}
         mauSac="#FF4D4F" // Đỏ nguy hiểm
         phuDe={`${phanTramBiCam}% tổng số SV`}
         mauPhuDe="#A0AEC0"
@@ -80,7 +80,7 @@ export const CacTheDashboard: React.FC<ThuocTinhCacTheDashboard> = ({
       <TheThongKe
         tieuDe="Người lạ hôm nay"
         giaTri={chiSoKpi.nguoiLaPhatHienHomNay.toLocaleString('vi-VN')}
-        bieuTuong={<EyeInvisibleOutlined />}
+        bieuTuong={<IconEyeOff size={18} />}
         mauSac="#805AD5" // Màu tím hoàng gia
         phuDe="Phát hiện hôm nay"
         mauPhuDe="#A0AEC0"

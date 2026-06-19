@@ -1,9 +1,6 @@
 'use client';
 
 import React from 'react';
-import { Layout } from 'antd';
-
-const { Footer: ChanTrangAntd } = Layout;
 
 /**
  * Component Chân trang (Footer) của hệ thống.
@@ -11,7 +8,7 @@ const { Footer: ChanTrangAntd } = Layout;
  */
 export const ChanTrang: React.FC = () => {
   return (
-    <ChanTrangAntd
+    <footer
       style={{
         backgroundColor: '#1f5ca9',
         color: '#FFFFFF',
@@ -30,7 +27,7 @@ export const ChanTrang: React.FC = () => {
           Phát triển bởi Trung tâm Công nghệ Phần mềm Đại học Cần Thơ (CUSC) &copy; {new Date().getFullYear()}
         </div>
       </div>
-    </ChanTrangAntd>
+    </footer>
   );
 };
 

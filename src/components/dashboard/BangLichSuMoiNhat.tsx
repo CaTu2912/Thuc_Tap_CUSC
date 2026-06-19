@@ -1,8 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Table, Button, Space, Tag } from 'antd';
-import { ColumnsType } from 'antd/es/table';
+import { Table, Button, Badge } from '@mantine/core';
 import { LichSuRaVao } from '../../types/LichSuRaVao';
 import { useRouter } from 'next/navigation';
 import { DUONG_DAN } from '@/constants';
@@ -20,101 +19,102 @@ interface ThuocTinhBangLichSuMoiNhat {
  * Component Bảng lịch sử ra vào mới nhất tại dashboard (BangLichSuMoiNhat).
  * Chức năng: Thể hiện danh sách quét thẻ ra vào KTX gần nhất của sinh viên, kèm hình ảnh, hướng đi và vị trí thiết bị.
  */
-export const BangLichSuMoiNhat: React.FC<ThuocTinhBangLichSuMoiNhat> = ({ duLieu, dangTai = false }) => {
+export const BangLichSuMoiNhat: React.FC<ThuocTinhBangLichSuMoiNhat> = ({ duLieu = [], dangTai = false }) => {
   const boChuyenHuong = useRouter();
 
-  // Cấu hình các cột cho bảng lịch sử khớp với ảnh chụp
-  const cacCot: ColumnsType<LichSuRaVao> = [
-    {
-      title: 'Thời gian',
-      dataIndex: 'thoiGian',
-      key: 'thoiGian',
-      width: 90,
-      render: (text) => {
-        return <span className="font-sans text-[11px] text-zinc-500 font-medium">{text}</span>;
-      },
-    },
-    {
-      title: 'MSSV',
-      dataIndex: 'mssv',
-      key: 'mssv',
-      width: 90,
-      render: (text) => {
-        return <span className="font-mono text-[11px] text-zinc-700 font-bold">{text}</span>;
-      },
-    },
-    {
-      title: 'Họ tên',
-      dataIndex: 'hoVaTen',
-      key: 'hoVaTen',
-      width: 140,
-      render: (text) => {
-        return <span className="font-sans text-[11px] text-zinc-800 font-semibold">{text}</span>;
-      },
-    },
-    {
-      title: 'Khu KTX',
-      dataIndex: 'tenKtx',
-      key: 'tenKtx',
-      width: 90,
-      render: (text) => {
-        return <span className="font-sans text-[11px] text-zinc-500 font-medium">{text}</span>;
-      },
-    },
-    {
-      title: 'Hành động',
-      dataIndex: 'loai',
-      key: 'loai',
-      width: 90,
-      align: 'center',
-      render: (loai) => {
-        const laVao = loai === 'IN';
-        return (
-          <Tag 
-            color={laVao ? 'success' : 'error'} 
-            className="rounded-full px-2.5 py-0.5 border-none text-[10px] font-bold w-12 text-center"
-          >
-            {laVao ? 'Vào' : 'Ra'}
-          </Tag>
-        );
-      },
-    },
-    {
-      title: 'Cổng',
-      dataIndex: 'thietBi',
-      key: 'thietBi',
-      width: 110,
-      render: (text) => {
-        return <span className="font-sans text-[11px] text-zinc-500 font-medium">{text}</span>;
-      },
-    },
-  ];
-
   return (
-    <div className="bg-white rounded-xl border border-zinc-100 shadow-xs overflow-hidden flex flex-col h-full">
+    <div className="bg-white rounded-xl border border-zinc-100 shadow-xs overflow-hidden flex flex-col h-full bg-white">
       <div className="p-4 border-b border-zinc-100 bg-zinc-50/50 flex justify-between items-center h-12">
-        <span className="font-bold text-sm text-zinc-800">LỊCH SỬ VÀO/RA MỚI NHẤT</span>
+        <span className="font-bold text-sm text-zinc-800 uppercase font-sans">LỊCH SỬ VÀO/RA MỚI NHẤT</span>
         <Button
-          type="link"
-          size="small"
+          variant="transparent"
+          size="xs"
           onClick={() => {
             return boChuyenHuong.push(DUONG_DAN.HISTORY);
           }}
           className="text-[#00afef] hover:text-[#1f5ca9] p-0 font-semibold text-xs font-sans"
+          styles={{
+            root: {
+              height: 'auto',
+              padding: 0,
+            }
+          }}
         >
           Xem tất cả
         </Button>
       </div>
-      <Table<LichSuRaVao>
-        className="flex-1 flex flex-col [&_.ant-table]:flex-1 [&_.ant-table]:flex [&_.ant-table]:flex-col [&_.ant-table-container]:flex-1 [&_.ant-table-container]:flex [&_.ant-table-container]:flex-col [&_.ant-table-content]:flex-1 [&_.ant-table-content]:flex [&_.ant-table-content]:flex-col [&_.ant-table-content]:justify-between"
-        columns={cacCot}
-        dataSource={duLieu}
-        loading={dangTai}
-        rowKey="id"
-        pagination={false}
-        size="small"
-        scroll={{ x: 'max-content' }}
-      />
+
+      <div style={{ overflowX: 'auto', position: 'relative' }} className="flex-1">
+        {dangTai && (
+          <div className="absolute inset-0 bg-white/50 flex items-center justify-center z-10" />
+        )}
+        <Table horizontalSpacing="sm" verticalSpacing="xs" highlightOnHover>
+          <Table.Thead className="bg-zinc-50/30">
+            <Table.Tr>
+              <Table.Th style={{ width: 90, padding: '6px 10px', fontSize: '11px', fontWeight: 700, color: '#334155', fontFamily: 'var(--font-k2d)' }}>Thời gian</Table.Th>
+              <Table.Th style={{ width: 90, padding: '6px 10px', fontSize: '11px', fontWeight: 700, color: '#334155', fontFamily: 'var(--font-k2d)' }}>MSSV</Table.Th>
+              <Table.Th style={{ width: 140, padding: '6px 10px', fontSize: '11px', fontWeight: 700, color: '#334155', fontFamily: 'var(--font-k2d)' }}>Họ tên</Table.Th>
+              <Table.Th style={{ width: 90, padding: '6px 10px', fontSize: '11px', fontWeight: 700, color: '#334155', fontFamily: 'var(--font-k2d)' }}>Khu KTX</Table.Th>
+              <Table.Th style={{ width: 90, padding: '6px 10px', textAlign: 'center', fontSize: '11px', fontWeight: 700, color: '#334155', fontFamily: 'var(--font-k2d)' }}>Hành động</Table.Th>
+              <Table.Th style={{ width: 110, padding: '6px 10px', fontSize: '11px', fontWeight: 700, color: '#334155', fontFamily: 'var(--font-k2d)' }}>Cổng</Table.Th>
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody>
+            {duLieu.length === 0 ? (
+              <Table.Tr>
+                <Table.Td colSpan={6} align="center" style={{ padding: '20px 10px' }}>
+                  <span className="text-zinc-400 text-xs">Không có dữ liệu</span>
+                </Table.Td>
+              </Table.Tr>
+            ) : (
+              duLieu.map((record) => {
+                const laVao = record.loai === 'IN';
+                return (
+                  <Table.Tr key={record.id}>
+                    <Table.Td style={{ padding: '6px 10px' }}>
+                      <span className="font-sans text-[11px] text-zinc-500 font-medium">{record.thoiGian}</span>
+                    </Table.Td>
+                    <Table.Td style={{ padding: '6px 10px' }}>
+                      <span className="font-mono text-[11px] text-zinc-700 font-bold">{record.mssv}</span>
+                    </Table.Td>
+                    <Table.Td style={{ padding: '6px 10px' }}>
+                      <span className="font-sans text-[11px] text-zinc-800 font-semibold">{record.hoVaTen}</span>
+                    </Table.Td>
+                    <Table.Td style={{ padding: '6px 10px' }}>
+                      <span className="font-sans text-[11px] text-zinc-500 font-medium">{record.tenKtx}</span>
+                    </Table.Td>
+                    <Table.Td style={{ padding: '6px 10px', textAlign: 'center' }}>
+                      <Badge
+                        color={laVao ? 'green' : 'red'}
+                        variant="light"
+                        radius="xl"
+                        styles={{
+                          root: {
+                            fontWeight: 700,
+                            fontSize: '10px',
+                            width: '48px',
+                            textAlign: 'center',
+                            padding: '2px 0px',
+                            textTransform: 'none',
+                            height: 'auto',
+                            display: 'inline-flex',
+                            justifyContent: 'center',
+                          }
+                        }}
+                      >
+                        {laVao ? 'Vào' : 'Ra'}
+                      </Badge>
+                    </Table.Td>
+                    <Table.Td style={{ padding: '6px 10px' }}>
+                      <span className="font-sans text-[11px] text-zinc-500 font-medium">{record.thietBi}</span>
+                    </Table.Td>
+                  </Table.Tr>
+                );
+              })
+            )}
+          </Table.Tbody>
+        </Table>
+      </div>
     </div>
   );
 };

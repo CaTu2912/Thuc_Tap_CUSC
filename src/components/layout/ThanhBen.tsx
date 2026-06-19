@@ -1,26 +1,21 @@
 'use client';
 
 import React from 'react';
-import { Layout, Menu, MenuProps } from 'antd';
 import {
-  BarChartOutlined,
-  DashboardOutlined,
-  FolderOpenOutlined,
-  HistoryOutlined,
-  LogoutOutlined,
-  MessageOutlined,
-  TeamOutlined,
-  UserOutlined,
-  ClockCircleOutlined,
-  StopOutlined,
-  DollarOutlined,
-  EyeInvisibleOutlined,
-} from '@ant-design/icons';
-import { usePathname, useRouter } from 'next/navigation';
-import { dungKhoXacThuc } from '@/store/khoXacThuc';
+  IconLayoutDashboard,
+  IconClock,
+  IconChartBar,
+  IconFolder,
+  IconUser,
+  IconUsers,
+  IconBan,
+  IconCurrencyDollar,
+  IconEyeOff,
+  IconMessage,
+  IconLogout,
+} from '@tabler/icons-react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { DUONG_DAN } from '@/constants';
-
-const { Sider } = Layout;
 
 /**
  * Component Thanh bên (Sidebar) điều hướng chính của hệ thống.
@@ -28,47 +23,67 @@ const { Sider } = Layout;
  */
 export const ThanhBen: React.FC = () => {
   const duongDanHienTai = usePathname();
+  const thamSoQuery = useSearchParams();
   const boChuyenHuong = useRouter();
-  const dangXuat = dungKhoXacThuc((trangThai) => trangThai.dangXuat);
 
   // Hàm xử lý sự kiện khi người dùng click chọn mục menu
-  const xuLyBamMenu: MenuProps['onClick'] = (suKien) => {
-    if (suKien.key === 'logout') {
-      dangXuat();
-      boChuyenHuong.push(DUONG_DAN.LOGIN);
+  const xuLyBamMenu = (key: string) => {
+    if (key === 'logout') {
+      console.log('Đăng xuất...');
+      boChuyenHuong.push('/login');
       return;
     }
-    boChuyenHuong.push(suKien.key);
+    boChuyenHuong.push(key);
+  };
+
+  // Xác định một menu item có đang active hay không dựa trên path và query string
+  const kiemTraActive = (key: string) => {
+    if (key.includes('?')) {
+      const [path, query] = key.split('?');
+      if (duongDanHienTai !== path) return false;
+      
+      const params = new URLSearchParams(query);
+      for (const [k, v] of params.entries()) {
+        if (thamSoQuery.get(k) !== v) return false;
+      }
+      return true;
+    }
+    
+    if (key === DUONG_DAN.CATEGORIES.STUDENTS) {
+      return duongDanHienTai === DUONG_DAN.CATEGORIES.STUDENTS && !thamSoQuery.get('loc');
+    }
+    
+    return duongDanHienTai === key;
   };
 
   // Nhãn nhóm menu (section header)
   const NhanNhom = ({ text }: { text: string }) => (
-    <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest block pt-1">
+    <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest block px-6 pt-4 pb-2">
       {text}
     </span>
   );
 
-  // Cấu hình menu khớp với ảnh thiết kế
-  const cacMucMenu: MenuProps['items'] = [
+  // Cấu hình menu khớp với ảnh thiết kế dùng Tabler Icons
+  const cacMucMenu = [
     // ── Top-level items ──
     {
       key: DUONG_DAN.DASHBOARD,
-      icon: <DashboardOutlined />,
+      icon: <IconLayoutDashboard size={18} stroke={1.8} />,
       label: 'Dashboard',
     },
     {
       key: DUONG_DAN.HISTORY,
-      icon: <ClockCircleOutlined />,
+      icon: <IconClock size={18} stroke={1.8} />,
       label: 'Lịch sử ra vào',
     },
     {
       key: DUONG_DAN.STATISTICS,
-      icon: <BarChartOutlined />,
+      icon: <IconChartBar size={18} stroke={1.8} />,
       label: 'Thống kê',
     },
     {
       key: DUONG_DAN.CATEGORIES.STUDENTS,
-      icon: <FolderOpenOutlined />,
+      icon: <IconFolder size={18} stroke={1.8} />,
       label: 'Danh mục hệ thống',
     },
 
@@ -79,12 +94,12 @@ export const ThanhBen: React.FC = () => {
       children: [
         {
           key: `${DUONG_DAN.CATEGORIES.STUDENTS}?loc=coMat`,
-          icon: <UserOutlined />,
+          icon: <IconUser size={18} stroke={1.8} />,
           label: 'Sinh viên đang có mặt',
         },
         {
           key: `${DUONG_DAN.CATEGORIES.STUDENTS}?loc=vangMat`,
-          icon: <TeamOutlined />,
+          icon: <IconUsers size={18} stroke={1.8} />,
           label: 'Sinh viên vắng mặt',
         },
       ],
@@ -97,17 +112,17 @@ export const ThanhBen: React.FC = () => {
       children: [
         {
           key: DUONG_DAN.CATEGORIES.BANNED_STUDENTS,
-          icon: <StopOutlined />,
+          icon: <IconBan size={18} stroke={1.8} />,
           label: 'Sinh viên bị cấm',
         },
         {
           key: `${DUONG_DAN.CATEGORIES.STUDENTS}?loc=noPhi`,
-          icon: <DollarOutlined />,
+          icon: <IconCurrencyDollar size={18} stroke={1.8} />,
           label: 'Sinh viên nợ phí',
         },
         {
           key: `${DUONG_DAN.ALERTS}?loai=STRANGER`,
-          icon: <EyeInvisibleOutlined />,
+          icon: <IconEyeOff size={18} stroke={1.8} />,
           label: 'Người lạ',
         },
       ],
@@ -120,7 +135,7 @@ export const ThanhBen: React.FC = () => {
       children: [
         {
           key: DUONG_DAN.FEEDBACK,
-          icon: <MessageOutlined />,
+          icon: <IconMessage size={18} stroke={1.8} />,
           label: 'Phản hồi MyCTU',
         },
       ],
@@ -129,38 +144,58 @@ export const ThanhBen: React.FC = () => {
     // ── Đăng xuất ──
     {
       key: 'logout',
-      icon: <LogoutOutlined className="text-rose-500" />,
-      label: <span className="text-rose-500 font-medium">Đăng xuất</span>,
+      icon: <IconLogout size={18} stroke={1.8} />,
+      label: <span className="font-medium text-rose-500">Đăng xuất</span>,
     },
   ];
 
-  // Xác định selectedKey dựa trên đường dẫn hiện tại (bỏ query string)
-  const selectedKey = (() => {
-    const path = duongDanHienTai;
-    if (path.startsWith(DUONG_DAN.CATEGORIES.STUDENTS)) return DUONG_DAN.CATEGORIES.STUDENTS;
-    if (path.startsWith(DUONG_DAN.CATEGORIES.BANNED_STUDENTS)) return DUONG_DAN.CATEGORIES.BANNED_STUDENTS;
-    return path;
-  })();
+  const renderMenuItem = (item: any) => {
+    const active = kiemTraActive(item.key);
+    const laDangXuat = item.key === 'logout';
+    
+    return (
+      <button
+        key={item.key}
+        onClick={() => xuLyBamMenu(item.key)}
+        className={`relative flex items-center gap-3 text-[13px] w-[calc(100%-16px)] mx-2 my-[2px] px-4 py-2.5 transition-all duration-150 select-none font-medium rounded-lg cursor-pointer text-left
+          ${active 
+            ? 'bg-[#00afef]/10 text-[#00afef]' 
+            : laDangXuat
+              ? 'text-rose-500 hover:bg-rose-50'
+              : 'text-zinc-700 hover:bg-zinc-100/60 hover:text-zinc-900'
+          }`}
+      >
+        <span className={`shrink-0 ${active ? 'text-[#00afef]' : laDangXuat ? 'text-rose-500' : 'text-zinc-400'}`}>
+          {item.icon}
+        </span>
+        <span className="truncate">{item.label}</span>
+      </button>
+    );
+  };
+
+  const renderMenu = () => {
+    return cacMucMenu.map((item, index) => {
+      if ('type' in item && item.type === 'group') {
+        return (
+          <div key={`group-${index}`} className="flex flex-col">
+            {item.label}
+            {item.children?.map((child) => renderMenuItem(child))}
+          </div>
+        );
+      }
+      return renderMenuItem(item);
+    });
+  };
 
   return (
-    <Sider
-      width={220}
-      breakpoint="lg"
-      collapsedWidth="0"
-      style={{ backgroundColor: '#FFFFFF', borderRight: '1px solid #f0f0f0' }}
-      className="h-full shadow-sm"
+    <aside
+      style={{ borderRight: '1px solid #f0f0f0' }}
+      className="hidden lg:block w-[220px] shrink-0 h-full bg-white shadow-sm select-none"
     >
-      <div className="py-3 flex flex-col h-full">
-        <Menu
-          mode="inline"
-          selectedKeys={[selectedKey]}
-          items={cacMucMenu}
-          onClick={xuLyBamMenu}
-          className="border-none flex-1"
-          style={{ borderRight: 0, fontSize: 13 }}
-        />
+      <div className="py-3 flex flex-col h-full overflow-y-auto">
+        {renderMenu()}
       </div>
-    </Sider>
+    </aside>
   );
 };
 

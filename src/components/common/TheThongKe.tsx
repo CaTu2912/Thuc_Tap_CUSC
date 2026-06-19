@@ -1,10 +1,8 @@
 'use client';
 
 import React from 'react';
-import { Card, Typography } from 'antd';
-import { ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
-
-const { Text } = Typography;
+import { Card, Text } from '@mantine/core';
+import { IconArrowUp, IconArrowDown } from '@tabler/icons-react';
 
 // Định nghĩa giao diện thuộc tính cho thẻ hiển thị thống kê số liệu
 interface ThuocTinhTheThongKe {
@@ -52,17 +50,22 @@ export const TheThongKe: React.FC<ThuocTinhTheThongKe> = ({
 }) => {
   return (
     <Card
-      variant="borderless"
-      className={`shadow-xs hover:shadow-md transition-shadow duration-300 rounded-xl overflow-hidden relative ${tenLop}`}
-      styles={{ body: { padding: '12px 16px' } }}
-      style={{ borderLeft: `5px solid ${mauSac}` }}
+      radius="xl"
+      p="md"
+      className={`shadow-xs hover:shadow-md transition-shadow duration-300 overflow-hidden relative bg-white ${tenLop}`}
+      style={{
+        borderLeft: `5px solid ${mauSac}`,
+        borderTop: '1px solid #f4f4f5',
+        borderRight: '1px solid #f4f4f5',
+        borderBottom: '1px solid #f4f4f5',
+      }}
     >
       <div className="flex justify-between items-start gap-2">
         <div className="flex flex-col flex-1 min-w-0">
-          <Text className="text-zinc-400 font-semibold uppercase tracking-wider text-[10px]">
+          <Text size="xs" c="dimmed" fw={600} className="uppercase tracking-wider text-[10px]" style={{ fontSize: '10px' }}>
             {tieuDe}
           </Text>
-          <span className="text-xl font-black text-zinc-800 tracking-tight leading-none mt-1.5">
+          <span className="text-xl font-black text-zinc-800 tracking-tight leading-none mt-1.5 font-sans">
             {giaTri}
           </span>
         </div>
@@ -76,20 +79,20 @@ export const TheThongKe: React.FC<ThuocTinhTheThongKe> = ({
         )}
       </div>
       {phuDe && (
-        <div className="mt-2 text-[10px] font-medium leading-none" style={{ color: mauPhuDe || '#A0AEC0' }}>
+        <div className="mt-2 text-[10px] font-medium leading-none" style={{ color: mauPhuDe || '#A0AEC0', fontSize: '10px' }}>
           {phuDe}
         </div>
       )}
       {!phuDe && xuHuong && (
-        <div className="mt-2 flex items-center gap-1 text-[10px]">
+        <div className="mt-2 flex items-center gap-1 text-[10px]" style={{ fontSize: '10px' }}>
           {xuHuong.loai === 'up' ? (
             <span className="text-emerald-500 flex items-center font-bold">
-              <ArrowUpOutlined className="mr-0.5" />
+              <IconArrowUp size={10} className="mr-0.5" />
               {xuHuong.giaTri}
             </span>
           ) : (
             <span className="text-rose-500 flex items-center font-bold">
-              <ArrowDownOutlined className="mr-0.5" />
+              <IconArrowDown size={10} className="mr-0.5" />
               {xuHuong.giaTri}
             </span>
           )}

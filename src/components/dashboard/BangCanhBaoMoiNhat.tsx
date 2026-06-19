@@ -1,10 +1,9 @@
 'use client';
 
 import React from 'react';
-import { Table, Button, Badge, Space } from 'antd';
-import { ColumnsType } from 'antd/es/table';
+import { Table, Button } from '@mantine/core';
 import { CanhBao } from '../../types/CanhBao';
-import { EyeInvisibleOutlined, StopOutlined, DollarOutlined, TeamOutlined } from '@ant-design/icons';
+import { IconEyeOff, IconBan, IconCurrencyDollar, IconUsers } from '@tabler/icons-react';
 import { useRouter } from 'next/navigation';
 import { DUONG_DAN } from '@/constants';
 
@@ -21,70 +20,8 @@ interface ThuocTinhBangCanhBaoMoiNhat {
  * Component Bảng hiển thị cảnh báo an ninh mới nhất tại dashboard (BangCanhBaoMoiNhat).
  * Chức năng: Liệt kê các sự cố an ninh trong ngày (thiết bị offline, người lạ, vi phạm), đếm số lượng sự cố chưa xử lý và cho phép duyệt nhanh.
  */
-export const BangCanhBaoMoiNhat: React.FC<ThuocTinhBangCanhBaoMoiNhat> = ({ duLieu, dangTai = false }) => {
+export const BangCanhBaoMoiNhat: React.FC<ThuocTinhBangCanhBaoMoiNhat> = ({ duLieu = [], dangTai = false }) => {
   const boChuyenHuong = useRouter();
-
-  // Định nghĩa danh sách các cột cho bảng cảnh báo mới nhất khớp với ảnh chụp
-  const cacCot: ColumnsType<CanhBao> = [
-    {
-      title: 'Thời gian',
-      dataIndex: 'thoiGian',
-      key: 'thoiGian',
-      width: 90,
-      render: (text) => {
-        return <span className="font-sans text-[11px] text-zinc-500 font-medium">{text}</span>;
-      },
-    },
-    {
-      title: 'Loại cảnh báo',
-      dataIndex: 'noiDung',
-      key: 'noiDung',
-      width: 180,
-      render: (text, record) => {
-        let bieuTuong = <EyeInvisibleOutlined />;
-        let mauSac = '#FF4D4F'; // Mặc định đỏ cho người lạ
-        if (record.loaiCanhBao === 'FORBIDDEN') {
-          bieuTuong = <StopOutlined />;
-          mauSac = '#FF4D4F';
-        } else if (record.loaiCanhBao === 'DEBT') {
-          bieuTuong = <DollarOutlined />;
-          mauSac = '#ED8936'; // Vàng cam
-        } else if (record.loaiCanhBao === 'ABSENT') {
-          bieuTuong = <TeamOutlined />;
-          mauSac = '#52C41A'; // Xanh lá
-        }
-        return (
-          <div className="flex items-center gap-1.5 font-sans font-semibold text-[11px]" style={{ color: mauSac }}>
-            <span className="flex items-center text-xs shrink-0">{bieuTuong}</span>
-            <span>{text}</span>
-          </div>
-        );
-      },
-    },
-    {
-      title: 'Đối tượng',
-      dataIndex: 'doiTuong',
-      key: 'doiTuong',
-      width: 110,
-      render: (doiTuong) => {
-        const laUnknown = doiTuong === 'Unknown';
-        return (
-          <span className={`font-mono text-[11px] ${laUnknown ? 'text-zinc-400 font-normal' : 'text-zinc-700 font-bold'}`}>
-            {doiTuong || 'Unknown'}
-          </span>
-        );
-      },
-    },
-    {
-      title: 'Khu KTX',
-      dataIndex: 'tenKtx',
-      key: 'tenKtx',
-      width: 90,
-      render: (tenKtx) => {
-        return <span className="font-sans text-[11px] text-zinc-500 font-medium">{tenKtx}</span>;
-      },
-    },
-  ];
 
   // Tính số lượng cảnh báo chưa được trực ban xử lý
   const soLuongCanhBaoChuaXuLy = duLieu.filter((a) => {
@@ -92,33 +29,91 @@ export const BangCanhBaoMoiNhat: React.FC<ThuocTinhBangCanhBaoMoiNhat> = ({ duLi
   }).length;
 
   return (
-    <div className="bg-white rounded-xl border border-zinc-100 shadow-xs overflow-hidden flex flex-col h-full">
+    <div className="bg-white rounded-xl border border-zinc-100 shadow-xs overflow-hidden flex flex-col h-full bg-white">
       <div className="p-4 border-b border-zinc-100 bg-zinc-50/50 flex justify-between items-center h-12">
         <div className="flex items-center gap-2">
-          <span className="font-bold text-sm text-zinc-800">CẢNH BÁO MỚI NHẤT</span>
+          <span className="font-bold text-sm text-zinc-800 uppercase font-sans">CẢNH BÁO MỚI NHẤT</span>
         </div>
         <Button
-          type="link"
-          size="small"
+          variant="transparent"
+          size="xs"
           onClick={() => {
             return boChuyenHuong.push(DUONG_DAN.ALERTS);
           }}
           className="text-[#00afef] hover:text-[#1f5ca9] p-0 font-semibold text-xs font-sans"
+          styles={{
+            root: {
+              height: 'auto',
+              padding: 0,
+            }
+          }}
         >
           Xem tất cả
         </Button>
       </div>
-      <Table<CanhBao>
-        className="flex-1 flex flex-col [&_.ant-table]:flex-1 [&_.ant-table]:flex [&_.ant-table]:flex-col [&_.ant-table-container]:flex-1 [&_.ant-table-container]:flex [&_.ant-table-container]:flex-col [&_.ant-table-content]:flex-1 [&_.ant-table-content]:flex [&_.ant-table-content]:flex-col [&_.ant-table-content]:justify-between"
-        columns={cacCot}
-        dataSource={duLieu}
-        loading={dangTai}
-        rowKey="id"
-        pagination={false}
-        size="small"
-        scroll={{ x: 'max-content' }}
-        sticky
-      />
+
+      <div style={{ overflowX: 'auto', position: 'relative' }} className="flex-1">
+        {dangTai && (
+          <div className="absolute inset-0 bg-white/50 flex items-center justify-center z-10" />
+        )}
+        <Table horizontalSpacing="sm" verticalSpacing="xs" highlightOnHover>
+          <Table.Thead className="bg-zinc-50/30">
+            <Table.Tr>
+              <Table.Th style={{ width: 90, padding: '6px 10px', fontSize: '11px', fontWeight: 700, color: '#334155', fontFamily: 'var(--font-k2d)' }}>Thời gian</Table.Th>
+              <Table.Th style={{ width: 180, padding: '6px 10px', fontSize: '11px', fontWeight: 700, color: '#334155', fontFamily: 'var(--font-k2d)' }}>Loại cảnh báo</Table.Th>
+              <Table.Th style={{ width: 110, padding: '6px 10px', fontSize: '11px', fontWeight: 700, color: '#334155', fontFamily: 'var(--font-k2d)' }}>Đối tượng</Table.Th>
+              <Table.Th style={{ width: 90, padding: '6px 10px', fontSize: '11px', fontWeight: 700, color: '#334155', fontFamily: 'var(--font-k2d)' }}>Khu KTX</Table.Th>
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody>
+            {duLieu.length === 0 ? (
+              <Table.Tr>
+                <Table.Td colSpan={4} align="center" style={{ padding: '20px 10px' }}>
+                  <span className="text-zinc-400 text-xs">Không có dữ liệu</span>
+                </Table.Td>
+              </Table.Tr>
+            ) : (
+              duLieu.map((record) => {
+                let bieuTuong = <IconEyeOff size={12} />;
+                let mauSac = '#FF4D4F'; // Mặc định đỏ cho người lạ
+                if (record.loaiCanhBao === 'FORBIDDEN') {
+                  bieuTuong = <IconBan size={12} />;
+                  mauSac = '#FF4D4F';
+                } else if (record.loaiCanhBao === 'DEBT') {
+                  bieuTuong = <IconCurrencyDollar size={12} />;
+                  mauSac = '#ED8936'; // Vàng cam
+                } else if (record.loaiCanhBao === 'ABSENT') {
+                  bieuTuong = <IconUsers size={12} />;
+                  mauSac = '#52C41A'; // Xanh lá
+                }
+                const laUnknown = record.doiTuong === 'Unknown';
+
+                return (
+                  <Table.Tr key={record.id}>
+                    <Table.Td style={{ padding: '6px 10px' }}>
+                      <span className="font-sans text-[11px] text-zinc-500 font-medium">{record.thoiGian}</span>
+                    </Table.Td>
+                    <Table.Td style={{ padding: '6px 10px' }}>
+                      <div className="flex items-center gap-1.5 font-sans font-semibold text-[11px]" style={{ color: mauSac }}>
+                        <span className="flex items-center text-xs shrink-0">{bieuTuong}</span>
+                        <span>{record.noiDung}</span>
+                      </div>
+                    </Table.Td>
+                    <Table.Td style={{ padding: '6px 10px' }}>
+                      <span className={`font-mono text-[11px] ${laUnknown ? 'text-zinc-400 font-normal' : 'text-zinc-700 font-bold'}`}>
+                        {record.doiTuong || 'Unknown'}
+                      </span>
+                    </Table.Td>
+                    <Table.Td style={{ padding: '6px 10px' }}>
+                      <span className="font-sans text-[11px] text-zinc-500 font-medium">{record.tenKtx}</span>
+                    </Table.Td>
+                  </Table.Tr>
+                );
+              })
+            )}
+          </Table.Tbody>
+        </Table>
+      </div>
     </div>
   );
 };
